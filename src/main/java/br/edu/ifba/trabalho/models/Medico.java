@@ -1,6 +1,7 @@
 package br.edu.ifba.trabalho.models;
 
 import br.edu.ifba.trabalho.dtos.MedicoEnviar;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,8 +22,12 @@ public class Medico {
 	private String crm;
 	@Enumerated(EnumType.STRING)
 	private Especialidade especialidade;
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	private Endereco endereco;
+	
+	public Medico() {
+		
+	}
 	
 	public Medico(MedicoEnviar dadosMedico) {
 		this.nome = dadosMedico.nome();
@@ -30,12 +35,11 @@ public class Medico {
 		this.telefone = dadosMedico.telefone();
 		this.crm = dadosMedico.crm();
 		this.especialidade = dadosMedico.especialidade();
+		this.endereco = dadosMedico.endereco();
 	}
+	
 	public Long getId() {
 		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
 	}
 	public String getNome() {
 		return nome;

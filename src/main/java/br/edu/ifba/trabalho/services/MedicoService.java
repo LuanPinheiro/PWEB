@@ -5,8 +5,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import br.edu.ifba.trabalho.dtos.MedicoEnviar;
 import br.edu.ifba.trabalho.dtos.MedicoListar;
@@ -24,36 +25,49 @@ public class MedicoService {
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 	
-	private List<MedicoListar> converteListar(List<Medico> lista){
+	private List<MedicoListar> converteLista(List<Medico> lista){
 		return lista.stream().map(MedicoListar::new).collect(Collectors.toList());
 	}
 	
-	public List<MedicoListar> listarTodos() {
-		return this.converteListar(medicoRepository.findAll());
+	public List<MedicoListar> listarTodos(Integer page) {
+		if(page == null) {
+			page = 0;
+		}
+		
+		return this.converteLista(medicoRepository.findAllByOrderByNomeAsc(PageRequest.of(page, 10)));
 	}
 	
-	public Medico enviarMedico(@RequestBody MedicoEnviar dadosMedico){
+	public void enviarMedico(MedicoEnviar dadosMedico){
+		// Validar endereço antes de continuar...
 		Medico medico = new Medico(dadosMedico);
-		
-		// Busca se o endereco já existe na base de dados
-//		Optional<Endereco> enderecoMedico = enderecoRepository.findAll(dadosMedico.endereco());
-		
-		
-		
-		
-//		if(enderecoMedico.isEmpty()) {
-//			System.out.println("AQUI");
-			// Se o endereço não existir cria um novo endereço na base de dados
-			// enderecoMedico = enderecoService.enviarEndereco();
-//		}
-		
-		// Se o endereço for validado e criado no banco, altera o endereço do medico
-//		if(enderecoMedico.isPresent()) {
-//			medico.setEndereco(enderecoMedico.get());	
-//		}
-				
 		medicoRepository.save(medico);
-		
-		return medico;
 	}
+
+	public Boolean removeMedico(Long id) {
+		Optional<Medico> medico = medicoRepository.findById(id);
+		if(medico.isEmpty()) {
+			return false;
+		}
+		
+		medicoRepository.delete(medico.get());
+		return true;
+	}
+
+	public Boolean atualizaMedico(MedicoEnviar medicoParam, Long id) {
+		Optional<Medico> medico = medicoRepository.findById(id);
+		if(medico.isEmpty()) {
+			return false;
+		}
+		
+		if(medicoParam.email() != null || medicoParam.endereco() != null || medicoParam.especialidade() != null) {
+			return false;
+		}
+		
+		medico.get().setNome(medicoParam.nome() == null ? medico.get().getNome() : medicoParam.nome());
+		medico.get().setTelefone(medicoParam.telefone());
+		medico.get().setEndereco(medicoParam.endereco());
+		medicoRepository.save(medico.get());
+		return true;
+	}
+	
 }
