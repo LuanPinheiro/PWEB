@@ -2,20 +2,18 @@ package br.edu.ifba.trabalho.models;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import br.edu.ifba.trabalho.dtos.MedicoEnviar;
+import br.edu.ifba.trabalho.dtos.PacienteEnviar;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-@Entity(name = "medicos")
-public class Medico {
+@Entity(name = "pacientes")
+public class Paciente {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,29 +25,25 @@ public class Medico {
 	@Column(nullable = false)
 	private String telefone;
 	@Column(unique = true, nullable = false)
-	private String crm;
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Especialidade especialidade;
+	private String cpf;
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(nullable = false)
 	private Endereco endereco;
 	@ColumnDefault(value = "TRUE")
 	private Boolean ativo;
 	
-	public Medico() {
+	public Paciente() {
 		
 	}
 	
-	public Medico(MedicoEnviar dados) {
+	public Paciente(PacienteEnviar dados) {
 		this.nome = dados.nome();
 		this.email = dados.email();
 		this.telefone = dados.telefone();
-		this.crm = dados.crm();
-		this.especialidade = dados.especialidade();
+		this.cpf = dados.cpf();
 		this.endereco = new Endereco(dados.endereco());
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -71,17 +65,11 @@ public class Medico {
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
-	public String getCrm() {
-		return crm;
+	public String getCpf() {
+		return cpf;
 	}
-	public void setCrm(String crm) {
-		this.crm = crm;
-	}
-	public Especialidade getEspecialidade() {
-		return especialidade;
-	}
-	public void setEspecialidade(Especialidade especialidade) {
-		this.especialidade = especialidade;
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 	public Endereco getEndereco() {
 		return endereco;

@@ -5,69 +5,95 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.trabalho.dtos.MedicoEnviar;
 import br.edu.ifba.trabalho.dtos.MedicoListar;
+import br.edu.ifba.trabalho.exceptions.InvalidFieldsException;
+import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
 import br.edu.ifba.trabalho.models.Endereco;
 import br.edu.ifba.trabalho.models.Medico;
-import br.edu.ifba.trabalho.repositories.EnderecoRepository;
 import br.edu.ifba.trabalho.repositories.MedicoRepository;
 
 @Service
-public class MedicoService {
+public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnviar, MedicoListar>{
 
 	@Autowired
 	private MedicoRepository medicoRepository;
 	
-	@Autowired
-	private EnderecoRepository enderecoRepository;
-	
-	private List<MedicoListar> converteLista(List<Medico> lista){
+	@Override
+	public List<MedicoListar> converteLista(List<Medico> lista){
+		// Convertendo cada registro de uma query para um DTO de listagem
 		return lista.stream().map(MedicoListar::new).collect(Collectors.toList());
 	}
 	
+	@Override
 	public List<MedicoListar> listarTodos(Integer page) {
-		if(page == null) {
-			page = 0;
-		}
-		
-		return this.converteLista(medicoRepository.findAllByOrderByNomeAsc(PageRequest.of(page, 10)));
+		// Retorna os registros do banco em forma de DTO
+		return this.converteLista(medicoRepository.findAllByAtivoTrueOrderByNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
 	}
 	
-	public void enviarMedico(MedicoEnviar dadosMedico){
-		// Validar endereço antes de continuar...
-		Medico medico = new Medico(dadosMedico);
+	@Override
+	public void novoRegistro(MedicoEnviar dados) {
+		// Gera nova instância com os dados enviados na requisição e a salva no banco
+		Medico medico = new Medico(dados);
+		medico.setAtivo(true);
 		medicoRepository.save(medico);
 	}
 
-	public Boolean removeMedico(Long id) {
-		Optional<Medico> medico = medicoRepository.findById(id);
-		if(medico.isEmpty()) {
-			return false;
+	@Override
+	public void removeRegistro(Long id) throws RegistroNotFoundException {
+		Medico medico;
+		try {
+			medico = encontrarPorId(id);
+		}
+		catch(RegistroNotFoundException e) {
+			throw e;
 		}
 		
-		medicoRepository.delete(medico.get());
-		return true;
+		// Apaga o registro logicamente, mudando o valor de uma variável booleana
+		medico.setAtivo(false);
+		medicoRepository.save(medico);
 	}
 
-	public Boolean atualizaMedico(MedicoEnviar medicoParam, Long id) {
-		Optional<Medico> medico = medicoRepository.findById(id);
-		if(medico.isEmpty()) {
-			return false;
+	@Override
+	public void atualizaRegistro(MedicoEnviar dados, Long id) 
+			throws RegistroNotFoundException, InvalidFieldsException {
+		// Valida se algum campo inválido foi enviado na requisição
+		if(dados.email() != null 
+				|| dados.crm() != null 
+				|| dados.especialidade() != null
+				|| dados.equals(new MedicoEnviar())) {
+			throw new InvalidFieldsException();
 		}
 		
-		if(medicoParam.email() != null || medicoParam.endereco() != null || medicoParam.especialidade() != null) {
-			return false;
+		Medico medico;
+		try {
+			medico = encontrarPorId(id);
+		}
+		catch(RegistroNotFoundException e) {
+			throw e;
 		}
 		
-		medico.get().setNome(medicoParam.nome() == null ? medico.get().getNome() : medicoParam.nome());
-		medico.get().setTelefone(medicoParam.telefone());
-		medico.get().setEndereco(medicoParam.endereco());
-		medicoRepository.save(medico.get());
-		return true;
+		// Altera os valores dessa instância no banco, com os dados enviados na requisição e salva no banco
+		medico.setNome(dados.nome() == null ? medico.getNome() : dados.nome());
+		medico.setTelefone(dados.telefone() == null ? medico.getTelefone() : dados.telefone());
+		// Mudar o new endereço, precisa identificar se o endereço já existe no banco para não haver tuplas
+		medico.setEndereco(dados.endereco() == null ? medico.getEndereco() : new Endereco(dados.endereco()));
+		
+		medicoRepository.save(medico);
 	}
-	
+
+	@Override
+	public Medico encontrarPorId(Long id) throws RegistroNotFoundException{
+		// Busca um registro no banco com o Id enviado na requisição
+		Optional<Medico> medico = medicoRepository.findById(id);
+		// Valida se o registro foi encontrado
+		if(medico.isEmpty() || medico.get().getAtivo() == false) {
+			throw new RegistroNotFoundException();
+		}
+		
+		return medico.get();
+	}
 }

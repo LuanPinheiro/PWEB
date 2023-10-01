@@ -9,5 +9,5 @@ import br.edu.ifba.trabalho.models.Medico;
 
 public interface MedicoRepository extends JpaRepository<Medico, Long>{
 
-	public List<Medico> findAllByOrderByNomeAsc(PageRequest of);
+	public List<Medico> findAllByAtivoTrueOrderByNomeAsc(PageRequest of);
 }

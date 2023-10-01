@@ -2,6 +2,8 @@ package br.edu.ifba.trabalho.models;
 
 import java.util.Objects;
 
+import br.edu.ifba.trabalho.dtos.EnderecoEnviar;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,13 +15,32 @@ public class Endereco {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(nullable = false)
 	private String logradouro;
 	private String numero;
 	private String complemento;
+	@Column(nullable = false)
 	private String bairro;
+	@Column(nullable = false)
 	private String cidade;
+	@Column(nullable = false)
 	private String uf;
+	@Column(nullable = false)
 	private String cep;
+	
+	public Endereco() {
+		
+	}
+	
+	public Endereco (EnderecoEnviar endereco) {
+		this.bairro = endereco.bairro();
+		this.cep = endereco.cep();
+		this.cidade = endereco.cidade();
+		this.complemento = endereco.complemento();
+		this.logradouro = endereco.logradouro();
+		this.numero = endereco.numero();
+		this.uf = endereco.uf();
+	}
 	
 	public Long getId() {
 		return id;
