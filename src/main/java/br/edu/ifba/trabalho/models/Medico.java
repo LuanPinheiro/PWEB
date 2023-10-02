@@ -20,20 +20,21 @@ public class Medico {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	@Column(nullable = false)
-	private String nome;
-	@Column(nullable = false)
-	private String email;
-	@Column(nullable = false)
-	private String telefone;
+	private DadosPessoais dadosPessoais;
+	
 	@Column(unique = true, nullable = false)
 	private String crm;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Especialidade especialidade;
+	
 	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(nullable = false)
 	private Endereco endereco;
+	
 	@ColumnDefault(value = "TRUE")
 	private Boolean ativo;
 	
@@ -42,9 +43,7 @@ public class Medico {
 	}
 	
 	public Medico(MedicoEnviar dados) {
-		this.nome = dados.nome();
-		this.email = dados.email();
-		this.telefone = dados.telefone();
+		this.dadosPessoais = dados.dadosPessoais();
 		this.crm = dados.crm();
 		this.especialidade = dados.especialidade();
 		this.endereco = new Endereco(dados.endereco());
@@ -53,23 +52,11 @@ public class Medico {
 	public Long getId() {
 		return id;
 	}
-	public String getNome() {
-		return nome;
+	public DadosPessoais getDadosPessoais() {
+		return dadosPessoais;
 	}
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getTelefone() {
-		return telefone;
-	}
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
+	public void setDadosPessoais(DadosPessoais dadosPessoais) {
+		this.dadosPessoais = dadosPessoais;
 	}
 	public String getCrm() {
 		return crm;
