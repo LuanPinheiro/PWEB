@@ -48,8 +48,6 @@ public class MedicoController {
 			medicoService.atualizaRegistro(dadosMedico, id);
 		} catch (RegistroNotFoundException e) {
 			return new ResponseEntity<>("Medico não encontrado", HttpStatus.BAD_REQUEST);
-		} catch (InvalidFieldsException e) {
-			return new ResponseEntity<>("Campos inválidos", HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}

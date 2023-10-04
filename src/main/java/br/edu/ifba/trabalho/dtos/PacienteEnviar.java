@@ -1,7 +1,8 @@
 package br.edu.ifba.trabalho.dtos;
 
-public record PacienteEnviar(String nome, String email, String telefone, String cpf, EnderecoEnviar endereco) {
-	public PacienteEnviar() {
-		this(null, null, null, null, null);
-	}
+import br.edu.ifba.trabalho.models.DadosPessoais;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
+public record PacienteEnviar(@Valid DadosPessoais dadosPessoais, @NotBlank(message = "CPF não pode ser enviado vazio") String cpf, @Valid EnderecoEnviar endereco) {
 }

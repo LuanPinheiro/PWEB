@@ -3,16 +3,15 @@ package br.edu.ifba.trabalho.models;
 import org.hibernate.annotations.ColumnDefault;
 
 import br.edu.ifba.trabalho.dtos.MedicoEnviar;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.validation.Valid;
 
 @Entity(name = "medicos")
 public class Medico {
@@ -21,7 +20,8 @@ public class Medico {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(nullable = false)
+	@Embedded
+	@Valid
 	private DadosPessoais dadosPessoais;
 	
 	@Column(unique = true, nullable = false)
@@ -30,10 +30,6 @@ public class Medico {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Especialidade especialidade;
-	
-	@ManyToOne(cascade = CascadeType.PERSIST)
-	@JoinColumn(nullable = false)
-	private Endereco endereco;
 	
 	@ColumnDefault(value = "TRUE")
 	private Boolean ativo;
@@ -46,7 +42,6 @@ public class Medico {
 		this.dadosPessoais = dados.dadosPessoais();
 		this.crm = dados.crm();
 		this.especialidade = dados.especialidade();
-		this.endereco = new Endereco(dados.endereco());
 	}
 	
 	public Long getId() {
@@ -70,16 +65,9 @@ public class Medico {
 	public void setEspecialidade(Especialidade especialidade) {
 		this.especialidade = especialidade;
 	}
-	public Endereco getEndereco() {
-		return endereco;
-	}
-	public void setEndereco(Endereco endereco) {
-		this.endereco = endereco;
-	}
 	public Boolean getAtivo() {
 		return ativo;
 	}
-
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
 	}

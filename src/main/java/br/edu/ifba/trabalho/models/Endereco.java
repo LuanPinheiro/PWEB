@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity(name = "enderecos")
 public class Endereco {
@@ -15,17 +16,28 @@ public class Endereco {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	@Column(nullable = false)
+	@NotBlank(message = "Logradouro não pode ser vazio")
 	private String logradouro;
+	
 	private String numero;
 	private String complemento;
+	
 	@Column(nullable = false)
+	@NotBlank(message = "Bairro não pode ser vazio")
 	private String bairro;
+	
 	@Column(nullable = false)
+	@NotBlank(message = "Cidade não pode ser vazio")
 	private String cidade;
+	
 	@Column(nullable = false)
+	@NotBlank(message = "UF não pode ser vazio")
 	private String uf;
+	
 	@Column(nullable = false)
+	@NotBlank(message = "CEP não pode ser vazio")
 	private String cep;
 	
 	public Endereco() {
