@@ -10,5 +10,5 @@ public interface PessoaServiceInterface<Tabela, DtoEnviar, DtoListar, DtoAtualiz
 	public List<DtoListar> listarTodos(Integer page);
 	public void novoRegistro(DtoEnviar dados);
 	public void removeRegistro(Long id) throws RegistroNotFoundException;
-	public void atualizaRegistro(DtoAtualizar dados, Long id) throws RegistroNotFoundException;
+	public void atualizaRegistro(DtoAtualizar dados, Long id) throws RegistroNotFoundException, InvalidFieldsException;
 }

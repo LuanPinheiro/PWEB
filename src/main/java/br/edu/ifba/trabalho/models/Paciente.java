@@ -22,7 +22,6 @@ public class Paciente {
 	private Long id;
 	
 	@Embedded
-	@Valid
 	private DadosPessoais dadosPessoais;
 	
 	@Column(unique = true, nullable = false)

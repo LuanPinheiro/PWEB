@@ -9,5 +9,5 @@ import br.edu.ifba.trabalho.models.Paciente;
 
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
-	public List<Paciente> findAllByAtivoTrueOrderByNomeAsc(PageRequest of);
+	public List<Paciente> findAllByAtivoTrueOrderByDadosPessoaisNomeAsc(PageRequest of);
 }

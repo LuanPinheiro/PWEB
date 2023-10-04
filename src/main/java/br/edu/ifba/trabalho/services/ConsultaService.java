@@ -25,11 +25,11 @@ public class ConsultaService {
 	@Autowired
 	private ConsultaRepository consultaRepository;
 	
-	@Autowired
-	private MedicoService medicoService;
-	
-	@Autowired
-	private PacienteService pacienteService;
+//	@Autowired
+//	private MedicoService medicoService;
+//	
+//	@Autowired
+//	private PacienteService pacienteService;
 	
 	
 	public List<ConsultaListar> converteLista(List<Consulta> lista){
@@ -52,24 +52,24 @@ public class ConsultaService {
 //		}
 		
 		// Busca se o médico indicado existe
-		Medico medico = null;
-		try {
-			medico = medicoService.encontrarPorId(dados.idMedico());
-		} catch (RegistroNotFoundException e) {
-			throw e;
-		}
-		
-		// Busca se o paciente indicado existe
-		Paciente paciente = null;
-		try {
-			paciente = pacienteService.encontrarPorId(dados.idPaciente());
-		} catch (RegistroNotFoundException e) {
-			throw e;
-		}
-		
-		// Validar segundo as regras de negócio antes de marcar a consulta
-		
-		consultaRepository.save(new Consulta(medico, paciente, data));
+//		Medico medico = null;
+//		try {
+//			medico = medicoService.encontrarPorId(dados.idMedico());
+//		} catch (RegistroNotFoundException e) {
+//			throw e;
+//		}
+//		
+//		// Busca se o paciente indicado existe
+//		Paciente paciente = null;
+//		try {
+//			paciente = pacienteService.encontrarPorId(dados.idPaciente());
+//		} catch (RegistroNotFoundException e) {
+//			throw e;
+//		}
+//		
+//		// Validar segundo as regras de negócio antes de marcar a consulta
+//		
+//		consultaRepository.save(new Consulta(medico, paciente, data));
 	}
 	
 	public void cancelarConsulta(ConsultaCancelar dados) throws RegistroNotFoundException {

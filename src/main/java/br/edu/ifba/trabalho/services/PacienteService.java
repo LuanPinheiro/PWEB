@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import br.edu.ifba.trabalho.dtos.PacienteAtualizar;
 import br.edu.ifba.trabalho.dtos.PacienteEnviar;
 import br.edu.ifba.trabalho.dtos.PacienteListar;
+import br.edu.ifba.trabalho.exceptions.InvalidFieldsException;
 import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
 import br.edu.ifba.trabalho.models.DadosPessoais;
 import br.edu.ifba.trabalho.models.Endereco;
 import br.edu.ifba.trabalho.models.Paciente;
 import br.edu.ifba.trabalho.repositories.PacienteRepository;
+import jakarta.validation.Valid;
 
 @Service
 public class PacienteService implements PessoaServiceInterface<Paciente, PacienteEnviar, PacienteListar, PacienteAtualizar> {
@@ -31,11 +33,11 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Override
 	public List<PacienteListar> listarTodos(Integer page) {
 		// Retorna os registros do banco em forma de DTO
-		return this.converteLista(pacienteRepository.findAllByAtivoTrueOrderByNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
+		return this.converteLista(pacienteRepository.findAllByAtivoTrueOrderByDadosPessoaisNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
 	}
 
 	@Override
-	public void novoRegistro(PacienteEnviar dados) {
+	public void novoRegistro(@Valid PacienteEnviar dados) {
 		// Gera nova instância com os dados enviados na requisição e a salva no banco
 		Paciente paciente = new Paciente(dados);
 		paciente.setAtivo(true);
@@ -52,7 +54,14 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public void atualizaRegistro(PacienteAtualizar dados, Long id)
-			throws RegistroNotFoundException {
+			throws RegistroNotFoundException, InvalidFieldsException {
+		
+		if(
+				dados.cpf() != null
+				|| dados.allFieldsNull()
+				) {
+			throw new InvalidFieldsException();
+		}
 		
 		Paciente paciente = pacienteRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
 		

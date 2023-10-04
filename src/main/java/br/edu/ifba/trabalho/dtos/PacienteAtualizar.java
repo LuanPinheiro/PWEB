@@ -1,5 +1,21 @@
 package br.edu.ifba.trabalho.dtos;
 
-public record PacienteAtualizar(String nome, String telefone, EnderecoEnviar endereco) {
+import jakarta.validation.Valid;
 
+public record PacienteAtualizar(
+		String nome,
+		String telefone,
+		@Valid EnderecoEnviar endereco,
+		String cpf) {
+	
+	private PacienteAtualizar() {
+		this(null, null, null, null);
+	}
+	
+	public boolean allFieldsNull() {
+		if(this.equals(new PacienteAtualizar(null, null, null, null))){
+			return true;
+		}
+		return false;
+	}
 }

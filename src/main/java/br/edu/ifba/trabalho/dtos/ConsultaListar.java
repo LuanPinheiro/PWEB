@@ -8,14 +8,14 @@ public record ConsultaListar(MedicoListar medico, PacienteListar paciente, Calen
 	public ConsultaListar(Consulta consulta) {
 		this(
 				new MedicoListar(
-						consulta.getMedico().getNome(),
-						consulta.getMedico().getEmail(),
+						consulta.getMedico().getDadosPessoais().getNome(),
+						consulta.getMedico().getDadosPessoais().getEmail(),
 						consulta.getMedico().getCrm(),
 						consulta.getMedico().getEspecialidade()
 				),
 				new PacienteListar(
-						consulta.getPaciente().getNome(),
-						consulta.getPaciente().getEmail(),
+						consulta.getPaciente().getDadosPessoais().getNome(),
+						consulta.getPaciente().getDadosPessoais().getEmail(),
 						consulta.getPaciente().getCpf()
 				),
 				consulta.getDataHora()

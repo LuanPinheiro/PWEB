@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.edu.ifba.trabalho.dtos.MedicoAtualizar;
 import br.edu.ifba.trabalho.dtos.MedicoEnviar;
 import br.edu.ifba.trabalho.dtos.MedicoListar;
+import br.edu.ifba.trabalho.exceptions.InvalidFieldsException;
 import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
 import br.edu.ifba.trabalho.models.DadosPessoais;
 import br.edu.ifba.trabalho.models.Endereco;
@@ -31,7 +32,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public List<MedicoListar> listarTodos(Integer page) {
 		// Retorna os registros do banco em forma de DTO
-		return this.converteLista(medicoRepository.findAllByAtivoTrueOrderByNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
+		return this.converteLista(medicoRepository.findAllByAtivoTrueOrderByDadosPessoaisNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
 	}
 	
 	@Override
@@ -52,13 +53,23 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 
 	@Override
 	public void atualizaRegistro(MedicoAtualizar dados, Long id) 
-			throws RegistroNotFoundException {
+			throws RegistroNotFoundException, InvalidFieldsException {
+		
+		if(
+				dados.email() != null 
+				|| dados.crm() != null
+				|| dados.especialidade() != null
+				|| dados.allFieldsNull()
+				) {
+			throw new InvalidFieldsException();
+		}
 		
 		Medico medico = medicoRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
 		
 		// Altera os valores dessa instância no banco, com os dados enviados na requisição e salva no banco
 		DadosPessoais dadosPessoais = medico.getDadosPessoais();
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
+		// Validar endereço corretamente antes
 		dadosPessoais.setEndereco(dados.endereco() == null ? dadosPessoais.getEndereco() : new Endereco(dados.endereco()));
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
 		
