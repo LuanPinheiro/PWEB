@@ -18,26 +18,21 @@ public class Endereco {
 	private Long id;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Logradouro não pode ser vazio")
 	private String logradouro;
 	
 	private String numero;
 	private String complemento;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Bairro não pode ser vazio")
 	private String bairro;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Cidade não pode ser vazio")
 	private String cidade;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "UF não pode ser vazio")
 	private String uf;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "CEP não pode ser vazio")
 	private String cep;
 	
 	public Endereco() {
@@ -102,20 +97,15 @@ public class Endereco {
 	public void setCep(String cep) {
 		this.cep = cep;
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Endereco other = (Endereco) obj;
-		return Objects.equals(bairro, other.bairro) && Objects.equals(cep, other.cep)
-				&& Objects.equals(cidade, other.cidade) && Objects.equals(complemento, other.complemento)
-				&& Objects.equals(logradouro, other.logradouro)
-				&& Objects.equals(numero, other.numero) && Objects.equals(uf, other.uf);
+
+	/**
+     * Retorna "true" caso os valores do DTO sejam iguais aos valores do registro
+     */
+	public boolean equalsDtoValues(EnderecoEnviar endereco) {
+		return (bairro == endereco.bairro()) && (cep == endereco.cep())
+				&& (cidade == endereco.cidade()) && (complemento == endereco.complemento())
+				&& (logradouro == endereco.logradouro()) && (numero == endereco.numero())
+				&& (uf == endereco.uf());
 	}
 	
 	

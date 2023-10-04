@@ -10,6 +10,6 @@ import br.edu.ifba.trabalho.models.ConsultaId;
 
 public interface ConsultaRepository extends JpaRepository<Consulta, ConsultaId> {
 
-	public Optional<Consulta> findByIdsAndDataHora(ConsultaId ids, Calendar dataHora);
+	public Consulta findByIds(ConsultaId ids);
 
 }

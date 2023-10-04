@@ -1,10 +1,13 @@
 package br.edu.ifba.trabalho.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -40,9 +43,9 @@ public class MedicoController {
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<MedicoListar> listarMedicos(@RequestParam(required = false) Integer page) {
-		
-		return medicoService.listarTodos(page);
+	public Page<MedicoListar> listarMedicos(@RequestParam("page") int page) {
+		final Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome"));
+		return medicoService.listarTodos(pageable);
 	}
 	
 	@PostMapping
@@ -76,7 +79,7 @@ public class MedicoController {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public Map<String, String> handleValidationExceptions(
 	  MethodArgumentNotValidException ex) {
-	    
+		
 		Map<String, String> errors = new HashMap<String, String>();
 	    ex.getBindingResult().getAllErrors().forEach((error) -> {
 	        String fieldName = ((FieldError) error).getField();

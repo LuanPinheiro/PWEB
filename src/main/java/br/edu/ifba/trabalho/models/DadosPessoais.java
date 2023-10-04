@@ -12,15 +12,12 @@ import jakarta.validation.constraints.NotBlank;
 public class DadosPessoais {
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Nome não pode ser vazio")
 	private String nome;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Email não pode ser vazio")
 	private String email;
 	
 	@Column(nullable = false)
-	@NotBlank(message = "Telefone não pode ser vazio")
 	private String telefone;
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)

@@ -2,7 +2,6 @@ package br.edu.ifba.trabalho.services;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,11 @@ public class ConsultaService {
 	@Autowired
 	private ConsultaRepository consultaRepository;
 	
-//	@Autowired
-//	private MedicoService medicoService;
-//	
-//	@Autowired
-//	private PacienteService pacienteService;
+	@Autowired
+	private MedicoService medicoService;
+	
+	@Autowired
+	private PacienteService pacienteService;
 	
 	
 	public List<ConsultaListar> converteLista(List<Consulta> lista){
@@ -44,6 +43,7 @@ public class ConsultaService {
 	
 	public void marcarConsulta(ConsultaEnviar dados) throws RegistroNotFoundException, DataInvalidaException{
 		Calendar data = dados.data();
+		this.encontrarPorIds(dados.idMedico(), dados.idPaciente(), dados.data());
 		// Domingo == 2
 //		if(data.get(Calendar.DAY_OF_WEEK) == 2 
 //				|| data.get(Calendar.HOUR_OF_DAY) < 7
@@ -51,35 +51,30 @@ public class ConsultaService {
 //			throw new DataInvalidaException();
 //		}
 		
-		// Busca se o médico indicado existe
-//		Medico medico = null;
-//		try {
-//			medico = medicoService.encontrarPorId(dados.idMedico());
-//		} catch (RegistroNotFoundException e) {
-//			throw e;
-//		}
-//		
-//		// Busca se o paciente indicado existe
-//		Paciente paciente = null;
-//		try {
-//			paciente = pacienteService.encontrarPorId(dados.idPaciente());
-//		} catch (RegistroNotFoundException e) {
-//			throw e;
-//		}
-//		
-//		// Validar segundo as regras de negócio antes de marcar a consulta
-//		
-//		consultaRepository.save(new Consulta(medico, paciente, data));
+//		 Busca se o médico indicado existe
+		Medico medico = medicoService.encontrarPorId(dados.idMedico());;
+		
+		// Busca se o paciente indicado existe
+		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente());
+		// Validar segundo as regras de negócio antes de marcar a consulta
+		
+		
+		
+		consultaRepository.save(new Consulta(medico, paciente, data));
 	}
 	
+	private void encontrarPorIds(Long idMedico, Long idPaciente, Calendar data) throws  {
+		consultaRepository.findBy(null, null);
+	}
+
 	public void cancelarConsulta(ConsultaCancelar dados) throws RegistroNotFoundException {
 		// Recupera a consulta no banco
-		Consulta consulta;
-		try {
-			consulta = encontrarPorIds(dados);
-		} catch (RegistroNotFoundException e) {
-			throw e;
-		}
+		Consulta consulta = consultaRepository.findByIds(
+				new ConsultaId(
+					dados.idMedico(),
+					dados.idPaciente(),
+					dados.data()
+				));
 		
 		// Cancela a consulta
 //		Calendar agora = Calendar.getInstance();
@@ -87,20 +82,20 @@ public class ConsultaService {
 		consultaRepository.delete(consulta);
 	}
 	
-	public Consulta encontrarPorIds(ConsultaCancelar dados) throws RegistroNotFoundException{
-		// Busca um registro no banco com os Ids enviado na requisição
-		Optional<Consulta> consulta = consultaRepository
-										.findByIdsAndDataHora(
-															new ConsultaId(
-																	dados.idMedico(),
-																	dados.idPaciente()
-															),
-															dados.data());
-		
-		// Valida se o registro foi encontrado
-		if(consulta.isEmpty()) {
-			throw new RegistroNotFoundException();
-		}
-		return consulta.get();
-	}
+//	public Consulta encontrarPorIds(ConsultaCancelar dados) throws RegistroNotFoundException{
+//		// Busca um registro no banco com os Ids enviado na requisição
+//		Optional<Consulta> consulta = consultaRepository
+//										.findByIdsAndDataHora(
+//															new ConsultaId(
+//																	dados.idMedico(),
+//																	dados.idPaciente()
+//															),
+//															dados.data());
+//		
+//		// Valida se o registro foi encontrado
+//		if(consulta.isEmpty()) {
+//			throw new RegistroNotFoundException();
+//		}
+//		return consulta.get();
+//	}
 }

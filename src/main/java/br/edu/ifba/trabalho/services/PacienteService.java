@@ -1,10 +1,8 @@
 package br.edu.ifba.trabalho.services;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.trabalho.dtos.PacienteAtualizar;
@@ -24,16 +22,13 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Autowired
 	private PacienteRepository pacienteRepository;
 	
+	@Autowired
+	private EnderecoService enderecoService;
+	
 	@Override
-	public List<PacienteListar> converteLista(List<Paciente> lista) {
-		// Convertendo cada registro de uma query para um DTO de listagem
-		return lista.stream().map(PacienteListar::new).collect(Collectors.toList());
-	}
-
-	@Override
-	public List<PacienteListar> listarTodos(Integer page) {
+	public Page<PacienteListar> listarTodos(Pageable pageable) {
 		// Retorna os registros do banco em forma de DTO
-		return this.converteLista(pacienteRepository.findAllByAtivoTrueOrderByDadosPessoaisNomeAsc(PageRequest.of(page == null ? 0 : page, 10)));
+		return pacienteRepository.findAll(pageable).map(PacienteListar::new);
 	}
 
 	@Override
@@ -56,22 +51,36 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	public void atualizaRegistro(PacienteAtualizar dados, Long id)
 			throws RegistroNotFoundException, InvalidFieldsException {
 		
-		if(
-				dados.cpf() != null
-				|| dados.allFieldsNull()
-				) {
-			throw new InvalidFieldsException();
-		}
+		this.validaCamposDto(dados);
 		
-		Paciente paciente = pacienteRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
+		Paciente paciente = encontrarPorId(id);
 		
 		// Altera os valores dessa instância no banco, com os dados enviados na requisição e salva no banco
 		DadosPessoais dadosPessoais = paciente.getDadosPessoais();
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
-		// Mudar o new endereço, precisa identificar se o endereço já existe no banco para não haver tuplas
-		dadosPessoais.setEndereco(dados.endereco() == null ? dadosPessoais.getEndereco() : new Endereco(dados.endereco()));
+		
+		if(dados.endereco() != null) {
+			Endereco enderecoFinal = enderecoService.encontraPorDto(dados.endereco());
+			dadosPessoais.setEndereco(enderecoFinal);
+		}
 		
 		pacienteRepository.save(paciente);
+	}
+	
+	@Override
+	public void validaCamposDto(PacienteAtualizar dto) throws InvalidFieldsException {
+		if(
+				dto.email() != null
+				|| dto.cpf() != null
+				|| dto.allFieldsNull()
+				) {
+			throw new InvalidFieldsException();
+		}
+	}
+
+	@Override
+	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
+		return pacienteRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
 	}
 }

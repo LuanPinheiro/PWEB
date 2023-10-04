@@ -15,26 +15,24 @@ public class Consulta {
 	
 	@EmbeddedId
 	private ConsultaId ids;
+	
 	@ManyToOne
 	@MapsId("medicoId")
 	@JoinColumn(nullable = false)
 	private Medico medico;
+	
 	@ManyToOne
 	@MapsId("pacienteId")
 	@JoinColumn(nullable = false)
 	private Paciente paciente;
 	
-	@Temporal(TemporalType.DATE)
-	private Calendar dataHora;
-	
 	public Consulta() {
 	}
 	
 	public Consulta(Medico medico, Paciente paciente, Calendar dataHora) {
-		this.ids = new ConsultaId(medico.getId(), paciente.getId());
+		this.ids = new ConsultaId(medico.getId(), paciente.getId(), dataHora);
 		this.medico = medico;
 		this.paciente = paciente;
-		this.dataHora = dataHora;
 	}
 
 	public ConsultaId getIds() {
@@ -62,10 +60,6 @@ public class Consulta {
 	}
 
 	public Calendar getDataHora() {
-		return dataHora;
-	}
-
-	public void setDataHora(Calendar dataHora) {
-		this.dataHora = dataHora;
+		return this.ids.getDataHora();
 	}
 }

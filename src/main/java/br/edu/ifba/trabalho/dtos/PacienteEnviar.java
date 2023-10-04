@@ -1,11 +1,12 @@
 package br.edu.ifba.trabalho.dtos;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import br.edu.ifba.trabalho.models.DadosPessoais;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 public record PacienteEnviar(
 		@Valid DadosPessoais dadosPessoais,
-		@NotBlank(message = "CPF não pode ser enviado vazio") String cpf,
+		@CPF String cpf,
 		@Valid EnderecoEnviar endereco) {
 }
