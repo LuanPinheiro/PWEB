@@ -1,10 +1,12 @@
 package br.edu.ifba.trabalho.dtos;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import br.edu.ifba.trabalho.models.Consulta;
+import jakarta.validation.constraints.Future;
 
-public record ConsultaListar(MedicoListar medico, PacienteListar paciente, Calendar data) {
+public record ConsultaListar(MedicoListar medico, PacienteListar paciente, @Future LocalDate data, LocalTime hora) {
 	public ConsultaListar(Consulta consulta) {
 		this(
 				new MedicoListar(
@@ -18,7 +20,8 @@ public record ConsultaListar(MedicoListar medico, PacienteListar paciente, Calen
 						consulta.getPaciente().getDadosPessoais().getEmail(),
 						consulta.getPaciente().getCpf()
 				),
-				consulta.getDataHora()
+				consulta.getData(),
+				consulta.getHora()
 		);
 	}
 }

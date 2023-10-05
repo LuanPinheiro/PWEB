@@ -21,8 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.ifba.trabalho.dtos.ConsultaCancelar;
 import br.edu.ifba.trabalho.dtos.ConsultaEnviar;
 import br.edu.ifba.trabalho.dtos.ConsultaListar;
+import br.edu.ifba.trabalho.exceptions.ConsultaExistenteException;
+import br.edu.ifba.trabalho.exceptions.ConsultaNotFoundException;
 import br.edu.ifba.trabalho.exceptions.DataInvalidaException;
 import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
+import br.edu.ifba.trabalho.repositories.PacienteJaAgendadoException;
 import br.edu.ifba.trabalho.services.ConsultaService;
 import jakarta.validation.Valid;
 
@@ -39,14 +42,20 @@ public class ConsultaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> marcarConsulta(@Valid @RequestBody ConsultaEnviar dados) throws RegistroNotFoundException, DataInvalidaException{
+	public ResponseEntity<?> marcarConsulta(@Valid @RequestBody ConsultaEnviar dados) 
+			throws RegistroNotFoundException,
+			DataInvalidaException,
+			ConsultaExistenteException,
+			PacienteJaAgendadoException{
 		
 		consultaService.marcarConsulta(dados);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<?> cancelarConsulta(@RequestBody ConsultaCancelar dados) throws RegistroNotFoundException{
+	public ResponseEntity<?> cancelarConsulta(@RequestBody ConsultaCancelar dados) 
+			throws RegistroNotFoundException,
+			ConsultaNotFoundException{
 		
 		consultaService.cancelarConsulta(dados);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -82,6 +91,33 @@ public class ConsultaController {
 	    
 		Map<String, String> errors = new HashMap<String, String>();
         errors.put("message", "Data inválida");
+	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ConsultaExistenteException.class)
+	public Map<String, String> handleConsultaExistenteException() {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Essa consulta já foi agendada");
+	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(ConsultaNotFoundException.class)
+	public Map<String, String> handleConsultaNotFoundException() {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Essa consulta não foi agendada");
+	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(PacienteJaAgendadoException.class)
+	public Map<String, String> handlePacienteJaAgendadoException() {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Esse paciente já possui consulta agendada para esse dia");
 	    return errors;
 	}
 }

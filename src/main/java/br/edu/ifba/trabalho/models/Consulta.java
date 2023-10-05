@@ -1,14 +1,13 @@
 package br.edu.ifba.trabalho.models;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 @Entity(name = "consultas")
 public class Consulta {
@@ -29,8 +28,8 @@ public class Consulta {
 	public Consulta() {
 	}
 	
-	public Consulta(Medico medico, Paciente paciente, Calendar dataHora) {
-		this.ids = new ConsultaId(medico.getId(), paciente.getId(), dataHora);
+	public Consulta(Medico medico, Paciente paciente, LocalDate data, LocalTime hora) {
+		this.ids = new ConsultaId(medico.getId(), paciente.getId(), data, hora);
 		this.medico = medico;
 		this.paciente = paciente;
 	}
@@ -59,7 +58,11 @@ public class Consulta {
 		this.paciente = paciente;
 	}
 
-	public Calendar getDataHora() {
-		return this.ids.getDataHora();
+	public LocalDate getData() {
+		return this.ids.getData();
+	}
+	
+	public LocalTime getHora() {
+		return this.ids.getHora();
 	}
 }

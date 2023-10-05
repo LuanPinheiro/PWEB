@@ -1,12 +1,12 @@
 package br.edu.ifba.trabalho.models;
 
 import java.io.Serializable;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotNull;
 
 @Embeddable
 public class ConsultaId implements Serializable {
@@ -17,22 +17,28 @@ public class ConsultaId implements Serializable {
 	@Column(name = "paciente_id", nullable = false)
 	private Long pacienteId;
 	
-	@Column(name = "data_hora", nullable = false)
-	private Calendar dataHora;
+	@Column(name = "data", nullable = false)
+	private LocalDate data;
+	
+	@Column(name = "hora", nullable = false)
+	private LocalTime hora;
 	
 	public ConsultaId() {
 		
 	}
 	
-	public ConsultaId(Long medicoId, Long pacienteId, Calendar dataHora) {
+	public ConsultaId(Long medicoId, Long pacienteId, LocalDate data, LocalTime hora) {
 		this.medicoId = medicoId;
 		this.pacienteId = pacienteId;
-		this.dataHora = dataHora;
+		this.data = data;
+		this.hora = hora;
 	}
+
+	
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dataHora, medicoId, pacienteId);
+		return Objects.hash(data, hora, medicoId, pacienteId);
 	}
 
 	@Override
@@ -44,11 +50,15 @@ public class ConsultaId implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ConsultaId other = (ConsultaId) obj;
-		return Objects.equals(dataHora, other.dataHora) && Objects.equals(medicoId, other.medicoId)
-				&& Objects.equals(pacienteId, other.pacienteId);
+		return Objects.equals(data, other.data) && Objects.equals(hora, other.hora)
+				&& Objects.equals(medicoId, other.medicoId) && Objects.equals(pacienteId, other.pacienteId);
 	}
 
-	public Calendar getDataHora() {
-		return this.dataHora;
+	public LocalDate getData() {
+		return this.data;
+	}
+	
+	public LocalTime getHora() {
+		return this.hora;
 	}
 }
