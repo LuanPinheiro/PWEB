@@ -122,10 +122,6 @@ public class ConsultaService {
 		// Validando se a data é num domingo
 		if(
 				data.getDayOfWeek() == DayOfWeek.SUNDAY
-				|| hora.getHour() < 7
-				|| hora.getHour() > 18
-				|| hora.getMinute() != 0
-				|| hora.getSecond() != 0
 				) {
 			throw new DataInvalidaException("Clínica não está disponível aos domingos");
 		}
