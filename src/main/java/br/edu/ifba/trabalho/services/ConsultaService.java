@@ -62,19 +62,21 @@ public class ConsultaService {
 		Medico medico;
 		if(dados.idMedico() != null) {
 			// Verifica se o médico existe e está ativo
-			medico = medicoService.encontrarPorId(dados.idMedico()).orElseThrow(() -> new RegistroNotFoundException("Médico"));
+			medico = medicoService.encontrarPorId(dados.idMedico());
 		}
 		else {
+			// Verifica se existe algum médico com a especialidade indicada e retorna um aleatório
 			medico = medicoService.medicoAleatorioPorEspecialidade(dados.especialidade());
 		}
 		
 		// Verifica se o paciente existe e está ativo
-		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente()).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
+		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente());
 		
 		LocalDate data = dados.data();
 		LocalTime hora = dados.hora();
-		
+		// Valida a data segundo as regras de negócio
 		this.validaData(data, hora);
+		// Valida a consulta segundo as regras de negócio
 		this.validaConsulta(medico, paciente, data, hora);
 		
 		consultaRepository.save(new Consulta(medico, paciente, data, hora));
@@ -99,10 +101,10 @@ public class ConsultaService {
 			throw new ConsultaNotFoundException("Consulta já foi desmarcada");
 		}
 
-		// Valida se a consulta está sendo desmarcada com no mínimo 24 horas de antecedência
 		LocalDateTime agora = LocalDateTime.now();
 		LocalDateTime cancelamento = LocalDateTime.of(dados.data(), dados.hora());
 		Duration diff = Duration.between(agora, cancelamento);
+		// Valida se a consulta está sendo desmarcada com no mínimo 24 horas de antecedência
 		if(diff.toHours() < 24) {
 			throw new CantCancelConsultaException();
 		}
@@ -115,15 +117,11 @@ public class ConsultaService {
 	}
 	
 	private void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
-		LocalTime now = LocalTime.now();
-		
+		LocalTime agora = LocalTime.now();
 		
 		// Validando se a data é num domingo
-		if(
-				data.getDayOfWeek() == DayOfWeek.SUNDAY
-				) {
+		if(data.getDayOfWeek() == DayOfWeek.SUNDAY)
 			throw new DataInvalidaException("Clínica não está disponível aos domingos");
-		}
 		
 		// Validando se a data é num domingo ou num horário inválido
 		if(
@@ -131,16 +129,14 @@ public class ConsultaService {
 				|| hora.getHour() > 18
 				|| hora.getMinute() != 0
 				|| hora.getSecond() != 0
-				) {
+				)
 			throw new DataInvalidaException("Clínica não está disponível nesse horário");
-		}
 		
 		
 		// Valida se a consulta está sendo feita com no mínimo 30min de antecedência
-		Duration diff = Duration.between(now, hora);
-		if(diff.toMinutes() <= 30) {
+		Duration diff = Duration.between(agora, hora);
+		if(diff.toMinutes() <= 30)
 			throw new DataInvalidaException("Consulta só pode ser marcada com no mínimo 30 minutos de antecedência");
-		}
 	}
 	
 	private void validaConsulta(Medico medico, Paciente paciente, LocalDate data, LocalTime hora) 

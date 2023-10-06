@@ -1,7 +1,5 @@
 package br.edu.ifba.trabalho.services;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,12 +28,12 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Override
 	public Page<PacienteListar> listarTodos(Pageable pageable) {
 		// Retorna os registros do banco em forma de DTO
-		return pacienteRepository.findAll(pageable).map(PacienteListar::new);
+		return pacienteRepository.findByAtivoTrue(pageable).map(PacienteListar::new);
 	}
 
 	@Override
 	public void novoRegistro(@Valid PacienteEnviar dados) {
-		// Gera nova instância com os dados enviados na requisição e a salva no banco
+		// Retorna o endereço que será usado pelo paciente
 		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
 		Paciente paciente = new Paciente(dados, endereco);
 		paciente.setAtivo(true);
@@ -44,8 +42,8 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Paciente paciente = encontrarPorId(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
-		// Apaga o registro logicamente, mudando o valor de uma variável booleana
+		Paciente paciente = this.encontrarPorId(id);
+		// Apaga o registro logicamente, mudando o valor de ativo
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
 	}
@@ -56,17 +54,16 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		
 		this.validaCamposDto(dados);
 		
-		Paciente paciente = encontrarPorId(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
+		Paciente paciente = encontrarPorId(id);
 		
-		// Altera os valores dessa instância no banco, com os dados enviados na requisição e salva no banco
 		DadosPessoais dadosPessoais = paciente.getDadosPessoais();
+		// Altera os valores que foram passados no request body
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
 		
-		if(dados.endereco() != null) {
-			Endereco enderecoFinal = enderecoService.encontraPorDto(dados.endereco());
-			dadosPessoais.setEndereco(enderecoFinal);
-		}
+		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
+		if(dados.endereco() != null)
+			dadosPessoais.setEndereco(enderecoService.encontraPorDto(dados.endereco()));
 		
 		pacienteRepository.save(paciente);
 	}
@@ -83,7 +80,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	}
 
 	@Override
-	public Optional<Paciente> encontrarPorId(Long id) throws RegistroNotFoundException {
-		return pacienteRepository.findByIdAndAtivoTrue(id);
+	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
+		return pacienteRepository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 	}
 }
