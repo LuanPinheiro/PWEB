@@ -7,7 +7,7 @@ public record MedicoAtualizar(
 		String nome,
 		String telefone,
 		String email,
-		@Valid EnderecoEnviar endereco,
+		@Valid EnderecoDTO endereco,
 		String crm,
 		Especialidade especialidade) {
 

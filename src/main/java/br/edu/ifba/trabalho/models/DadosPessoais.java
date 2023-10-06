@@ -1,5 +1,6 @@
 package br.edu.ifba.trabalho.models;
 
+import br.edu.ifba.trabalho.dtos.DadosPessoaisDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -27,6 +28,13 @@ public class DadosPessoais {
 	
 	public DadosPessoais() {
 		
+	}
+	
+	public DadosPessoais(DadosPessoaisDTO dados, Endereco endereco) {
+		this.nome = dados.nome();
+		this.email = dados.email();
+		this.telefone = dados.telefone();
+		this.endereco = endereco;
 	}
 
 	public String getNome() {

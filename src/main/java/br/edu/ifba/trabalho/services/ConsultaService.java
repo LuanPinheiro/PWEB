@@ -1,7 +1,6 @@
 package br.edu.ifba.trabalho.services;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -16,6 +15,7 @@ import br.edu.ifba.trabalho.dtos.ConsultaListar;
 import br.edu.ifba.trabalho.exceptions.ConsultaExistenteException;
 import br.edu.ifba.trabalho.exceptions.ConsultaNotFoundException;
 import br.edu.ifba.trabalho.exceptions.DataInvalidaException;
+import br.edu.ifba.trabalho.exceptions.MedicoUnavailableException;
 import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
 import br.edu.ifba.trabalho.models.Consulta;
 import br.edu.ifba.trabalho.models.ConsultaId;
@@ -51,7 +51,8 @@ public class ConsultaService {
 			throws RegistroNotFoundException,
 			DataInvalidaException,
 			ConsultaExistenteException,
-			PacienteJaAgendadoException{
+			PacienteJaAgendadoException,
+			MedicoUnavailableException{
 		
 		// Verifica se o médico existe e está ativo
 		Medico medico = medicoService.encontrarPorId(dados.idMedico());
@@ -94,7 +95,7 @@ public class ConsultaService {
 		consultaRepository.delete(consulta);
 	}
 	
-	public void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
+	private void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
 		LocalTime now = LocalTime.now();
 		
 		// Valida se a consulta está sendo marcada para uma data no passado
@@ -120,7 +121,10 @@ public class ConsultaService {
 //		}
 	}
 	
-	public void validaConsulta(Medico medico, Paciente paciente, LocalDate data, LocalTime hora) throws ConsultaExistenteException, PacienteJaAgendadoException {
+	private void validaConsulta(Medico medico, Paciente paciente, LocalDate data, LocalTime hora) 
+			throws ConsultaExistenteException,
+			PacienteJaAgendadoException,
+			MedicoUnavailableException {
 		// Valida se a consulta já existe
 		Consulta consulta = this.encontrarPorIds(new ConsultaId(medico.getId(), paciente.getId(), data, hora));
 		if(consulta != null) {
@@ -128,11 +132,14 @@ public class ConsultaService {
 		}
 		
 		// Valida se o médico já tem consulta nessa hora
-		
+		consulta = consultaRepository.findByIdsMedicoIdAndIdsHora(medico.getId(), hora);
+		if(consulta != null) {
+			throw new MedicoUnavailableException();
+		}
 		
 		// Valida se o paciente já tem consulta no dia
-		List<Consulta> consultas = consultaRepository.findByIdsDataAndIdsPacienteId(data, paciente.getId());
-		if(!consultas.isEmpty()) {
+		consulta = consultaRepository.findByIdsDataAndIdsPacienteId(data, paciente.getId());
+		if(consulta != null) {
 			throw new PacienteJaAgendadoException();
 		}
 	}

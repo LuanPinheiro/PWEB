@@ -2,7 +2,7 @@ package br.edu.ifba.trabalho.models;
 
 import java.util.Objects;
 
-import br.edu.ifba.trabalho.dtos.EnderecoEnviar;
+import br.edu.ifba.trabalho.dtos.EnderecoDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,7 +39,7 @@ public class Endereco {
 		
 	}
 	
-	public Endereco (EnderecoEnviar endereco) {
+	public Endereco (EnderecoDTO endereco) {
 		this.bairro = endereco.bairro();
 		this.cep = endereco.cep();
 		this.cidade = endereco.cidade();
@@ -101,7 +101,7 @@ public class Endereco {
 	/**
      * Retorna "true" caso os valores do DTO sejam iguais aos valores do registro
      */
-	public boolean equalsDtoValues(EnderecoEnviar endereco) {
+	public boolean equalsDtoValues(EnderecoDTO endereco) {
 		return (bairro == endereco.bairro()) && (cep == endereco.cep())
 				&& (cidade == endereco.cidade()) && (complemento == endereco.complemento())
 				&& (logradouro == endereco.logradouro()) && (numero == endereco.numero())

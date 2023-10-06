@@ -3,16 +3,12 @@ package br.edu.ifba.trabalho.models;
 import org.hibernate.annotations.ColumnDefault;
 
 import br.edu.ifba.trabalho.dtos.PacienteEnviar;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.Valid;
 
 @Entity(name = "pacientes")
 public class Paciente {
@@ -34,8 +30,8 @@ public class Paciente {
 		
 	}
 	
-	public Paciente(PacienteEnviar dados) {
-		this.dadosPessoais = dados.dadosPessoais();
+	public Paciente(PacienteEnviar dados, Endereco endereco) {
+		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.cpf = dados.cpf();
 	}
 

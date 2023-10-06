@@ -1,7 +1,5 @@
 package br.edu.ifba.trabalho.services;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +34,8 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public void novoRegistro(MedicoEnviar dados) {
 		// Gera nova instância com os dados enviados na requisição e a salva no banco
-		Medico medico = new Medico(dados);
+		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
+		Medico medico = new Medico(dados, endereco);
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
 	}

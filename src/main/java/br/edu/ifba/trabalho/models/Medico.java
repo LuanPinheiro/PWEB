@@ -11,7 +11,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.Valid;
 
 @Entity(name = "medicos")
 public class Medico {
@@ -37,8 +36,8 @@ public class Medico {
 		
 	}
 	
-	public Medico(MedicoEnviar dados) {
-		this.dadosPessoais = dados.dadosPessoais();
+	public Medico(MedicoEnviar dados, Endereco endereco) {
+		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.crm = dados.crm();
 		this.especialidade = dados.especialidade();
 	}

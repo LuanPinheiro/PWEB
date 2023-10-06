@@ -34,7 +34,8 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Override
 	public void novoRegistro(@Valid PacienteEnviar dados) {
 		// Gera nova instância com os dados enviados na requisição e a salva no banco
-		Paciente paciente = new Paciente(dados);
+		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
+		Paciente paciente = new Paciente(dados, endereco);
 		paciente.setAtivo(true);
 		pacienteRepository.save(paciente);
 	}

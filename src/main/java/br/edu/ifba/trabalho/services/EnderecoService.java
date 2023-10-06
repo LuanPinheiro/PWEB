@@ -3,7 +3,7 @@ package br.edu.ifba.trabalho.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.edu.ifba.trabalho.dtos.EnderecoEnviar;
+import br.edu.ifba.trabalho.dtos.EnderecoDTO;
 import br.edu.ifba.trabalho.models.Endereco;
 import br.edu.ifba.trabalho.repositories.EnderecoRepository;
 
@@ -13,7 +13,7 @@ public class EnderecoService {
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 	
-	public Endereco encontraPorDto(EnderecoEnviar endereco) {
+	public Endereco encontraPorDto(EnderecoDTO endereco) {
 		// Busca se o endereco passado pelo cliente já existe no banco para não gerar tupla
 		Endereco enderecoFinal = enderecoRepository
 				.findByLogradouroAndNumeroAndComplementoAndBairroAndCidadeAndUfAndCep(

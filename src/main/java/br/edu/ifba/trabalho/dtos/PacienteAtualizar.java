@@ -8,7 +8,7 @@ public record PacienteAtualizar(
 		String nome,
 		String telefone,
 		String email,
-		@Valid EnderecoEnviar endereco,
+		@Valid EnderecoDTO endereco,
 		@CPF String cpf) {
 	
 	private PacienteAtualizar() {
