@@ -15,7 +15,7 @@ public class EnderecoService {
 	
 	public Endereco encontraPorDto(EnderecoDTO endereco) {
 		// Busca se o endereco passado pelo cliente já existe no banco para não gerar tupla
-		Endereco enderecoFinal = enderecoRepository
+		return enderecoRepository
 				.findByLogradouroAndNumeroAndComplementoAndBairroAndCidadeAndUfAndCep(
 						endereco.logradouro(),
 						endereco.numero(),
@@ -23,12 +23,8 @@ public class EnderecoService {
 						endereco.bairro(),
 						endereco.cidade(),
 						endereco.uf(),
-						endereco.cep());
-		
-		// Se o endereço não foi encontrado cria no banco novo registro de endereço
-		if(enderecoFinal == null)
-			enderecoFinal = new Endereco(endereco);
-		
-		return enderecoFinal;
+						endereco.cep())
+				// Se o endereço não foi encontrado cria no banco novo registro de endereço
+				.orElseGet(() -> new Endereco(endereco));
 	}
 }

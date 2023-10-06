@@ -6,7 +6,11 @@ import java.time.LocalTime;
 import br.edu.ifba.trabalho.models.Consulta;
 import jakarta.validation.constraints.Future;
 
-public record ConsultaListar(MedicoListar medico, PacienteListar paciente, @Future LocalDate data, LocalTime hora) {
+public record ConsultaListar(
+		MedicoListar medico,
+		PacienteListar paciente,
+		@Future LocalDate data,
+		LocalTime hora) {
 	public ConsultaListar(Consulta consulta) {
 		this(
 				new MedicoListar(

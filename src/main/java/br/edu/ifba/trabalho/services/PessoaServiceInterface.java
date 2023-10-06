@@ -1,5 +1,7 @@
 package br.edu.ifba.trabalho.services;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +13,6 @@ public interface PessoaServiceInterface<Tabela, DtoEnviar, DtoListar, DtoAtualiz
 	public void novoRegistro(DtoEnviar dados);
 	public void removeRegistro(Long id) throws RegistroNotFoundException;
 	public void atualizaRegistro(DtoAtualizar dados, Long id) throws RegistroNotFoundException, InvalidFieldsException;
-	public Tabela encontrarPorId(Long id) throws RegistroNotFoundException;
+	public Optional<Tabela> encontrarPorId(Long id) throws RegistroNotFoundException;
 	public void validaCamposDto(DtoAtualizar dto) throws InvalidFieldsException;
 }

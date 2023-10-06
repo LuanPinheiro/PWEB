@@ -1,5 +1,7 @@
 package br.edu.ifba.trabalho.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +44,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Paciente paciente = pacienteRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
+		Paciente paciente = encontrarPorId(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 		// Apaga o registro logicamente, mudando o valor de uma variável booleana
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
@@ -54,7 +56,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		
 		this.validaCamposDto(dados);
 		
-		Paciente paciente = encontrarPorId(id);
+		Paciente paciente = encontrarPorId(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 		
 		// Altera os valores dessa instância no banco, com os dados enviados na requisição e salva no banco
 		DadosPessoais dadosPessoais = paciente.getDadosPessoais();
@@ -81,7 +83,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	}
 
 	@Override
-	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
-		return pacienteRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
+	public Optional<Paciente> encontrarPorId(Long id) throws RegistroNotFoundException {
+		return pacienteRepository.findByIdAndAtivoTrue(id);
 	}
 }

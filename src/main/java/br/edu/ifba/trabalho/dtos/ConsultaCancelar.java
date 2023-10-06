@@ -11,5 +11,5 @@ public record ConsultaCancelar(
 		@NotNull(message = "É necessário indicar um paciente") Long idPaciente,
 		@NotNull(message = "É necessário indicar uma data") LocalDate data,
 		@NotNull(message = "É necessário indicar uma hora") LocalTime hora,
-		@NotNull(message = "É necessário indicar um motivo para cancelamento")Motivo motivo) {
+		@NotNull(message = "É necessário indicar um motivo para cancelamento") Motivo motivo) {
 }

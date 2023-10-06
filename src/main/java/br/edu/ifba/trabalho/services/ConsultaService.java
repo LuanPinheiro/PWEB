@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +59,9 @@ public class ConsultaService {
 			MedicoUnavailableException{
 		
 		// Verifica se o médico existe e está ativo
-		Medico medico = medicoService.encontrarPorId(dados.idMedico());
-		if(medico.getAtivo() == false) {
-			throw new RegistroNotFoundException("Médico");
-		}
+		Medico medico = medicoService.encontrarPorId(dados.idMedico()).orElseThrow(() -> new RegistroNotFoundException("Médico"));
 		// Verifica se o paciente existe e está ativo
-		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente());
-		if(paciente.getAtivo() == false) {
-			throw new RegistroNotFoundException("Paciente");
-		}
+		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente()).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 		
 		LocalDate data = dados.data();
 		LocalTime hora = dados.hora();
@@ -77,7 +72,7 @@ public class ConsultaService {
 		consultaRepository.save(new Consulta(medico, paciente, data, hora));
 	}
 	
-	private Consulta encontrarPorIds(ConsultaId ids){
+	private Optional<Consulta> encontrarPorIds(ConsultaId ids){
 		return consultaRepository.findByIds(ids);
 	}
 
@@ -90,11 +85,7 @@ public class ConsultaService {
 				dados.idMedico(),
 				dados.idPaciente(),
 				dados.data(),
-				dados.hora()));
-		if(consulta == null) {
-			System.out.println("Não achou");
-			throw new ConsultaNotFoundException("Essa consulta não foi agendada");
-		}
+				dados.hora())).orElseThrow(() -> new ConsultaNotFoundException("Essa consulta não foi agendada"));
 		
 		if(consulta.isDesmarcado()) {
 			throw new ConsultaNotFoundException("Consulta já foi desmarcada");
@@ -127,14 +118,14 @@ public class ConsultaService {
 		}
 		
 		// Validando se a data é num domingo ou num horário inválido
-				if(
-						hora.getHour() < 7
-						|| hora.getHour() > 18
-						|| hora.getMinute() != 0
-						|| hora.getSecond() != 0
-						) {
-					throw new DataInvalidaException("Clínica não está disponível nesse horário");
-				}
+		if(
+				hora.getHour() < 7
+				|| hora.getHour() > 18
+				|| hora.getMinute() != 0
+				|| hora.getSecond() != 0
+				) {
+			throw new DataInvalidaException("Clínica não está disponível nesse horário");
+		}
 		
 		
 		// Valida se a consulta está sendo feita com no mínimo 30min de antecedência
@@ -149,21 +140,12 @@ public class ConsultaService {
 			PacienteJaAgendadoException,
 			MedicoUnavailableException {
 		// Valida se a consulta já existe
-		Consulta consulta = this.encontrarPorIds(new ConsultaId(medico.getId(), paciente.getId(), data, hora));
-		if(consulta != null) {
-			throw new ConsultaExistenteException();
-		}
+		encontrarPorIds(new ConsultaId(medico.getId(), paciente.getId(), data, hora)).orElseThrow(ConsultaExistenteException::new);
 		
 		// Valida se o médico já tem consulta nessa hora
-		consulta = consultaRepository.findByIdsMedicoIdAndIdsHora(medico.getId(), hora);
-		if(consulta != null) {
-			throw new MedicoUnavailableException();
-		}
+		consultaRepository.findByIdsMedicoIdAndIdsHora(medico.getId(), hora).orElseThrow(MedicoUnavailableException::new);
 		
 		// Valida se o paciente já tem consulta no dia
-		consulta = consultaRepository.findByIdsDataAndIdsPacienteId(data, paciente.getId());
-		if(consulta != null) {
-			throw new PacienteJaAgendadoException();
-		}
+		consultaRepository.findByIdsDataAndIdsPacienteId(data, paciente.getId()).orElseThrow(PacienteJaAgendadoException::new);
 	}
 }
