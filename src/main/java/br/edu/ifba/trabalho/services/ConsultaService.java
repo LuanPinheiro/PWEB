@@ -58,8 +58,16 @@ public class ConsultaService {
 			PacienteJaAgendadoException,
 			MedicoUnavailableException{
 		
-		// Verifica se o médico existe e está ativo
-		Medico medico = medicoService.encontrarPorId(dados.idMedico()).orElseThrow(() -> new RegistroNotFoundException("Médico"));
+		// Caso o usuário indique um id de médico
+		Medico medico;
+		if(dados.idMedico() != null) {
+			// Verifica se o médico existe e está ativo
+			medico = medicoService.encontrarPorId(dados.idMedico()).orElseThrow(() -> new RegistroNotFoundException("Médico"));
+		}
+		else {
+			medico = medicoService.medicoAleatorioPorEspecialidade(dados.especialidade());
+		}
+		
 		// Verifica se o paciente existe e está ativo
 		Paciente paciente = pacienteService.encontrarPorId(dados.idPaciente()).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 		

@@ -1,7 +1,9 @@
 package br.edu.ifba.trabalho.services;
 
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import br.edu.ifba.trabalho.exceptions.InvalidFieldsException;
 import br.edu.ifba.trabalho.exceptions.RegistroNotFoundException;
 import br.edu.ifba.trabalho.models.DadosPessoais;
 import br.edu.ifba.trabalho.models.Endereco;
+import br.edu.ifba.trabalho.models.Especialidade;
 import br.edu.ifba.trabalho.models.Medico;
 import br.edu.ifba.trabalho.repositories.MedicoRepository;
 
@@ -87,5 +90,13 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public Optional<Medico> encontrarPorId(Long id){
 		return medicoRepository.findByIdAndAtivoTrue(id);
+	}
+
+	public Medico medicoAleatorioPorEspecialidade(Especialidade especialidade) throws RegistroNotFoundException {
+		List<Medico> lista = medicoRepository.findByEspecialidade(especialidade);
+		if(lista.isEmpty()) {
+			throw new RegistroNotFoundException("Médico dessa especialidade");
+		}
+		return lista.get(new Random().nextInt());
 	}
 }
