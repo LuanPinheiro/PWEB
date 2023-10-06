@@ -7,7 +7,6 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 @Embeddable
 public class DadosPessoais {

@@ -42,7 +42,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 
 	@Override
 	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Medico medico = medicoRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
+		Medico medico = medicoRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Médico"));
 		// Apaga o registro logicamente, mudando o valor de uma variável booleana
 		medico.setAtivo(false);
 		medicoRepository.save(medico);
@@ -84,6 +84,6 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	
 	@Override
 	public Medico encontrarPorId(Long id) throws RegistroNotFoundException{
-		return medicoRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
+		return medicoRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Médico"));
 	}
 }

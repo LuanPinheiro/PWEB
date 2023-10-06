@@ -1,6 +1,5 @@
 package br.edu.ifba.trabalho.exceptions;
 
 @SuppressWarnings("serial")
-public class ConsultaExistenteException extends Exception {
-
+public class CantCancelConsultaException extends Exception {
 }

@@ -42,7 +42,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Paciente paciente = pacienteRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
+		Paciente paciente = pacienteRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 		// Apaga o registro logicamente, mudando o valor de uma variável booleana
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
@@ -82,6 +82,6 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
-		return pacienteRepository.findById(id).orElseThrow(RegistroNotFoundException::new);
+		return pacienteRepository.findById(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+@SuppressWarnings("serial")
 @Embeddable
 public class ConsultaId implements Serializable {
 	

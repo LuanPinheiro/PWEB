@@ -2,7 +2,6 @@ package br.edu.ifba.trabalho.dtos;
 
 import br.edu.ifba.trabalho.models.Especialidade;
 import br.edu.ifba.trabalho.models.Medico;
-import jakarta.validation.constraints.NotBlank;
 
 public record MedicoListar(
 		String nome,
