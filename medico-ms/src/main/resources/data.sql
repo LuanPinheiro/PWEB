@@ -1,0 +1,2 @@
+INSERT INTO ENDERECOS(bairro, cep, cidade, complemento, logradouro, numero, uf) VALUES('Liberdade','40000-000', 'Salvador', 'Complementando', 'Casa', '10', 'BA');
+INSERT INTO MEDICOS(nome, email, telefone, crm, especialidade, endereco_id) VALUES('Medico1','medico@email.com', '719999999', 'CRM AQUI', 'Ortopedia', 1);
