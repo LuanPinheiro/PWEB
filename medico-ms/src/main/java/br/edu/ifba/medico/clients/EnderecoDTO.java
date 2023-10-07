@@ -1,6 +1,5 @@
-package br.edu.ifba.clients;
+package br.edu.ifba.medico.clients;
 
-import br.edu.ifba.medico.models.Endereco;
 import jakarta.validation.constraints.NotBlank;
 
 public record EnderecoDTO(

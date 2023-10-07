@@ -1,6 +1,5 @@
-package br.edu.ifba.medico.models;
+package br.edu.ifba.medico.clients;
 
-import br.edu.ifba.clients.EnderecoDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -2,6 +2,7 @@ package br.edu.ifba.medico.models;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import br.edu.ifba.medico.clients.Endereco;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

@@ -1,5 +1,6 @@
 package br.edu.ifba.medico.models;
 
+import br.edu.ifba.medico.clients.Endereco;
 import br.edu.ifba.medico.dtos.DadosPessoaisDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,9 +21,8 @@ public class DadosPessoais {
 	@Column(nullable = false)
 	private String telefone;
 	
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(nullable = false)
-	@Valid
 	private Endereco endereco;
 	
 	public DadosPessoais() {

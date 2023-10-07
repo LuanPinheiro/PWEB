@@ -1,6 +1,6 @@
 package br.edu.ifba.medico.dtos;
 
-import br.edu.ifba.clients.EnderecoDTO;
+import br.edu.ifba.medico.clients.EnderecoDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
