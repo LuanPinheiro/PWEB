@@ -1,19 +1,17 @@
-package br.edu.ifba.medico.models;
+package br.edu.ifba.pacientes.models;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import br.edu.ifba.medico.dtos.MedicoEnviar;
+import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity(name = "medicos")
-public class Medico {
+@Entity(name = "pacientes")
+public class Paciente {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,45 +21,35 @@ public class Medico {
 	private DadosPessoais dadosPessoais;
 	
 	@Column(unique = true, nullable = false)
-	private String crm;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private Especialidade especialidade;
+	private String cpf;
 	
 	@ColumnDefault(value = "TRUE")
 	private Boolean ativo;
 	
-	public Medico() {
+	public Paciente() {
 		
 	}
 	
-	public Medico(MedicoEnviar dados, Endereco endereco) {
+	public Paciente(PacienteEnviar dados, Endereco endereco) {
 		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
-		this.crm = dados.crm();
-		this.especialidade = dados.especialidade();
+		this.cpf = dados.cpf();
 	}
-	
-	public Long getId() {
-		return id;
-	}
+
 	public DadosPessoais getDadosPessoais() {
 		return dadosPessoais;
 	}
+
 	public void setDadosPessoais(DadosPessoais dadosPessoais) {
 		this.dadosPessoais = dadosPessoais;
 	}
-	public String getCrm() {
-		return crm;
+	public Long getId() {
+		return id;
 	}
-	public void setCrm(String crm) {
-		this.crm = crm;
+	public String getCpf() {
+		return cpf;
 	}
-	public Especialidade getEspecialidade() {
-		return especialidade;
-	}
-	public void setEspecialidade(Especialidade especialidade) {
-		this.especialidade = especialidade;
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 	public Boolean getAtivo() {
 		return ativo;

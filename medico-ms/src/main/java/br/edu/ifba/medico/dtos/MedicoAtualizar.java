@@ -1,6 +1,5 @@
 package br.edu.ifba.medico.dtos;
 
-import br.edu.ifba.medico.clients.EnderecoDTO;
 import br.edu.ifba.medico.models.Especialidade;
 import jakarta.validation.Valid;
 

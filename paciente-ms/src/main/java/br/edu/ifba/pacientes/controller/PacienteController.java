@@ -1,4 +1,4 @@
-package br.edu.ifba.medico.controller;
+package br.edu.ifba.pacientes.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,82 +24,69 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ifba.medico.dtos.MedicoAtualizar;
-import br.edu.ifba.medico.dtos.MedicoEnviar;
-import br.edu.ifba.medico.dtos.MedicoListar;
-import br.edu.ifba.medico.exceptions.InvalidFieldsException;
-import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
-import br.edu.ifba.medico.models.Especialidade;
-import br.edu.ifba.medico.models.Medico;
-import br.edu.ifba.medico.services.MedicoService;
+import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
+import br.edu.ifba.pacientes.dtos.PacienteEnviar;
+import br.edu.ifba.pacientes.dtos.PacienteListar;
+import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
+import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
+import br.edu.ifba.pacientes.models.Paciente;
+import br.edu.ifba.pacientes.services.PacienteService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-
 @RestController
-@RequestMapping("/medicos")
-public class MedicoController {
-	
+@RequestMapping("/pacientes")
+public class PacienteController {
 	@Autowired
-	private MedicoService medicoService;
+	private PacienteService pacienteService;
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Page<MedicoListar> listarMedicos(@RequestParam("page") int page) {
+	public Page<PacienteListar> listarPacientes(@RequestParam("page") int page) {
 		final Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome"));
-		return medicoService.listarTodos(pageable);
+		return pacienteService.listarTodos(pageable);
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public void novoMedico(@Valid @RequestBody MedicoEnviar dadosMedico){
+	public void novoPaciente(@Valid @RequestBody PacienteEnviar dadosPaciente){
 		
-		medicoService.novoRegistro(dadosMedico);
+		pacienteService.novoRegistro(dadosPaciente);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<?> atualizaMedico(
-			@NotNull @Valid @RequestBody MedicoAtualizar dadosMedico,
+	public ResponseEntity<?> atualizaPaciente(
+			@NotNull @Valid @RequestBody PacienteAtualizar dadosPaciente,
 			@PathVariable Long id) 
 				throws RegistroNotFoundException, InvalidFieldsException {
 		
-		medicoService.atualizaRegistro(dadosMedico, id);
+		pacienteService.atualizaRegistro(dadosPaciente, id);
 		
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removeMedico(@PathVariable Long id) 
-			throws RegistroNotFoundException {
+	public ResponseEntity<?> removeMedico(@PathVariable Long id) throws RegistroNotFoundException {
 		
-		medicoService.removeRegistro(id);
+		pacienteService.removeRegistro(id);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<Medico> encontrarPorId(@PathVariable Long id) 
+	public ResponseEntity<Paciente> encontrarPorId(@PathVariable Long id) 
 			throws RegistroNotFoundException {
 		
-		Medico medico = medicoService.encontrarPorId(id);
+		Paciente paciente = pacienteService.encontrarPorId(id);
 		
-		return new ResponseEntity<>(medico,HttpStatus.OK);
-	}
-	
-	@GetMapping("/encontrarPorEspecialidade/{especialidade}")
-	public ResponseEntity<Medico> encontrarPorEspecialidade(@PathVariable Especialidade especialidade) 
-			throws RegistroNotFoundException {
-		
-		Medico medico = medicoService.medicoAleatorioPorEspecialidade(especialidade);
-		
-		return new ResponseEntity<>(medico,HttpStatus.ACCEPTED);
+		return new ResponseEntity<>(paciente,HttpStatus.OK);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public Map<String, String> handleValidationExceptions(
 	  MethodArgumentNotValidException ex) {
-		
+	    
 		Map<String, String> errors = new HashMap<String, String>();
 	    ex.getBindingResult().getAllErrors().forEach((error) -> {
 	        String fieldName = ((FieldError) error).getField();
@@ -114,7 +101,7 @@ public class MedicoController {
 	public Map<String, String> handleRegistroNotFoundException() {
 	    
 		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Médico não encontrado");
+        errors.put("message", "Paciente não encontrado");
 	    return errors;
 	}
 	

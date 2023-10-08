@@ -1,8 +1,7 @@
-package br.edu.ifba.medico.models;
+package br.edu.ifba.consulta.models;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import br.edu.ifba.medico.dtos.MedicoEnviar;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -34,12 +33,6 @@ public class Medico {
 	
 	public Medico() {
 		
-	}
-	
-	public Medico(MedicoEnviar dados, Endereco endereco) {
-		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
-		this.crm = dados.crm();
-		this.especialidade = dados.especialidade();
 	}
 	
 	public Long getId() {

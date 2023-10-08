@@ -1,4 +1,4 @@
-package br.edu.ifba.medico.dtos;
+package br.edu.ifba.pacientes.dtos;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

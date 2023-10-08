@@ -1,6 +1,5 @@
-package br.edu.ifba.medico.models;
+package br.edu.ifba.consulta.models;
 
-import br.edu.ifba.medico.dtos.DadosPessoaisDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -20,19 +19,13 @@ public class DadosPessoais {
 	@Column(nullable = false)
 	private String telefone;
 	
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(nullable = false)
+	@Valid
 	private Endereco endereco;
 	
 	public DadosPessoais() {
 		
-	}
-	
-	public DadosPessoais(DadosPessoaisDTO dados, Endereco endereco) {
-		this.nome = dados.nome();
-		this.email = dados.email();
-		this.telefone = dados.telefone();
-		this.endereco = endereco;
 	}
 
 	public String getNome() {

@@ -1,6 +1,6 @@
-package br.edu.ifba.medico.models;
+package br.edu.ifba.pacientes.models;
 
-import br.edu.ifba.medico.dtos.DadosPessoaisDTO;
+import br.edu.ifba.pacientes.dtos.DadosPessoaisDTO;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -22,6 +22,7 @@ public class DadosPessoais {
 	
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(nullable = false)
+	@Valid
 	private Endereco endereco;
 	
 	public DadosPessoais() {

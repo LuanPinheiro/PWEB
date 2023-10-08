@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.edu.ifba.medico.clients.Endereco;
 import br.edu.ifba.medico.clients.EnderecoClient;
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
@@ -17,6 +16,7 @@ import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 import br.edu.ifba.medico.models.DadosPessoais;
+import br.edu.ifba.medico.models.Endereco;
 import br.edu.ifba.medico.models.Especialidade;
 import br.edu.ifba.medico.models.Medico;
 import br.edu.ifba.medico.repositories.MedicoRepository;
