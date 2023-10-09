@@ -180,7 +180,7 @@ public class ConsultaService {
 	 * Valida se o médico já tem consulta nessa hora
 	 * */
 	private void medicoDisponivel(Long id, LocalDate data, LocalTime hora) throws MedicoUnavailableException {
-		if(consultaRepository.findByIdsMedicoIdAndIdsDataAndIdsHora(id, data, hora).isPresent()) {
+		if(consultaRepository.findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(id, data, hora).isPresent()) {
 			throw new MedicoUnavailableException();
 		}
 	}
