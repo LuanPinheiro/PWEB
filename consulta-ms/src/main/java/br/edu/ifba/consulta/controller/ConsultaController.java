@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import br.edu.ifba.consulta.exceptions.MedicoUnavailableException;
 import br.edu.ifba.consulta.exceptions.PacienteJaAgendadoException;
 import br.edu.ifba.consulta.exceptions.RegistroNotFoundException;
 import br.edu.ifba.consulta.services.ConsultaService;
+import feign.FeignException.FeignClientException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -78,6 +80,16 @@ public class ConsultaController {
 	        errors.put(fieldName, errorMessage);
 	    });
 	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(FeignClientException.class)
+	public Map<String, String> handleFeignClientException(FeignClientException ex) {
+		String table = "Paciente";
+	    if(ex.getMessage().contains("Médico")) {
+	    	table = "Médico";
+	    }
+	    return handleRegistroNotFoundException(new RegistroNotFoundException(table));
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)

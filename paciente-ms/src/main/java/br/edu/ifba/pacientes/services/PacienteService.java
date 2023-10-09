@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.edu.ifba.pacientes.clients.EnderecoClient;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
@@ -23,7 +22,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	private PacienteRepository pacienteRepository;
 	
 	@Autowired
-	private EnderecoClient enderecoClient;
+	private EnderecoService enderecoService;
 	
 	@Override
 	public Page<PacienteListar> listarTodos(Pageable pageable) {
@@ -34,7 +33,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Override
 	public void novoRegistro(PacienteEnviar dados) {
 		// Retorna o endereço que será usado pelo paciente
-		Endereco endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
+		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
 		System.out.println(endereco.getId());
 		Paciente paciente = new Paciente(dados, endereco);
 		paciente.setAtivo(true);
@@ -64,7 +63,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		
 		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
 		if(dados.endereco() != null)
-			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
+			dadosPessoais.setEndereco(enderecoService.encontraPorDto(dados.endereco()));
 		
 		pacienteRepository.save(paciente);
 	}

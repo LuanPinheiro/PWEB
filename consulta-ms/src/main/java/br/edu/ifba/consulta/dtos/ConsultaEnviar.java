@@ -3,7 +3,7 @@ package br.edu.ifba.consulta.dtos;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import br.edu.ifba.consulta.models.Especialidade;
+import br.edu.ifba.consulta.clients.Especialidade;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 

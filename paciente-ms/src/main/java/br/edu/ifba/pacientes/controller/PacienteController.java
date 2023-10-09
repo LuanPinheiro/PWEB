@@ -74,12 +74,12 @@ public class PacienteController {
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<Paciente> encontrarPorId(@PathVariable Long id) 
+	public ResponseEntity<Long> encontrarPorId(@PathVariable Long id) 
 			throws RegistroNotFoundException {
 		
 		Paciente paciente = pacienteService.encontrarPorId(id);
 		
-		return new ResponseEntity<>(paciente,HttpStatus.OK);
+		return new ResponseEntity<>(paciente.getId(),HttpStatus.OK);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)

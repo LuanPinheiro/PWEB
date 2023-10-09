@@ -1,4 +1,4 @@
-package br.edu.ifba.consulta.models;
+package br.edu.ifba.consulta.clients;
 
 public enum Especialidade {
 	Ortopedia,

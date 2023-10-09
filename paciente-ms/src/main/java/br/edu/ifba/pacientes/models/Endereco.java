@@ -1,5 +1,6 @@
 package br.edu.ifba.pacientes.models;
 
+import br.edu.ifba.pacientes.dtos.EnderecoDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,6 +34,16 @@ public class Endereco {
 	
 	public Endereco() {
 		
+	}
+	
+	public Endereco (EnderecoDTO endereco) {
+		this.bairro = endereco.bairro();
+		this.cep = endereco.cep();
+		this.cidade = endereco.cidade();
+		this.complemento = endereco.complemento();
+		this.logradouro = endereco.logradouro();
+		this.numero = endereco.numero();
+		this.uf = endereco.uf();
 	}
 	
 	public Long getId() {

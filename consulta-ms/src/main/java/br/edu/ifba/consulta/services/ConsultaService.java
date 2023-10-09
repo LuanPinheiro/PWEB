@@ -10,8 +10,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.consulta.clients.Especialidade;
 import br.edu.ifba.consulta.clients.MedicoClient;
 import br.edu.ifba.consulta.clients.PacienteClient;
 import br.edu.ifba.consulta.dtos.ConsultaCancelar;
@@ -26,8 +28,6 @@ import br.edu.ifba.consulta.exceptions.PacienteJaAgendadoException;
 import br.edu.ifba.consulta.exceptions.RegistroNotFoundException;
 import br.edu.ifba.consulta.models.Consulta;
 import br.edu.ifba.consulta.models.ConsultaId;
-import br.edu.ifba.consulta.models.Medico;
-import br.edu.ifba.consulta.models.Paciente;
 import br.edu.ifba.consulta.repositories.ConsultaRepository;
 
 @Service
@@ -60,16 +60,13 @@ public class ConsultaService {
 			PacienteJaAgendadoException,
 			MedicoUnavailableException{
 		
-		Medico medico = dados.idMedico() == null ?
-				medicoClient.encontrarPorEspecialidade(dados.especialidade()).getBody()
-				// Caso o usuário indique um id de médico
-				: medicoClient.encontrarPorId(dados.idMedico()).getBody();
-				
-		// Verifica se o paciente existe e está ativo
-		Paciente paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
-		
 		LocalDate data = dados.data();
 		LocalTime hora = dados.hora();
+		
+		Long medico = validaMedico(dados.idMedico(), dados.especialidade(), data, hora);
+				
+		Long paciente = validaPaciente(dados.idPaciente());
+
 		// Valida a data segundo as regras de negócio
 		this.validaData(data, hora);
 		// Valida a consulta segundo as regras de negócio
@@ -78,6 +75,21 @@ public class ConsultaService {
 		consultaRepository.save(new Consulta(medico, paciente, data, hora));
 	}
 	
+	private Long validaPaciente(Long idPaciente) throws RegistroNotFoundException {
+		ResponseEntity<?> resposta = pacienteClient.encontrarPorId(idPaciente);
+		
+		return (Long) resposta.getBody();
+	}
+
+	private Long validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
+		if(idMedico == null) {
+			List<Long> medicos = medicoClient.encontrarPorEspecialidade(especialidade).getBody();
+			return medicoDisponivelLista(medicos, data, hora);
+		}
+		
+		return medicoClient.encontrarPorId(idMedico).getBody();
+	}
+
 	public void cancelarConsulta(ConsultaCancelar dados) 
 			throws RegistroNotFoundException,
 			ConsultaNotFoundException,
@@ -126,18 +138,17 @@ public class ConsultaService {
 		
 		
 		// Valida se a consulta está sendo feita com no mínimo 30min de antecedência
-		Duration diff = Duration.between(agora, hora);
-		if(diff.toMinutes() <= 30)
+		if(Duration.between(hora, agora).toMinutes() <= 30)
 			throw new DataInvalidaException("Consulta só pode ser marcada com no mínimo 30 minutos de antecedência");
 	}
 	
-	private void validaConsulta(Medico medico, Paciente paciente, LocalDate data, LocalTime hora) 
+	private void validaConsulta(Long medico, Long paciente, LocalDate data, LocalTime hora) 
 			throws ConsultaExistenteException,
 			PacienteJaAgendadoException,
 			MedicoUnavailableException {
-		consultaExiste(new ConsultaId(medico.getId(), paciente.getId(), data, hora));
-		medicoDisponivel(medico.getId(), hora);
-		pacienteTemConsulta(paciente.getId(), data);
+		consultaExiste(new ConsultaId(medico, paciente, data, hora));
+		medicoDisponivel(medico, data, hora);
+		pacienteTemConsulta(paciente, data);
 	}
 	
 	/**
@@ -168,9 +179,29 @@ public class ConsultaService {
 	/**
 	 * Valida se o médico já tem consulta nessa hora
 	 * */
-	private void medicoDisponivel(Long id, LocalTime hora) throws MedicoUnavailableException {
-		if(consultaRepository.findByIdsMedicoIdAndIdsHora(id, hora).isPresent()) {
+	private void medicoDisponivel(Long id, LocalDate data, LocalTime hora) throws MedicoUnavailableException {
+		if(consultaRepository.findByIdsMedicoIdAndIdsDataAndIdsHora(id, data, hora).isPresent()) {
 			throw new MedicoUnavailableException();
 		}
+	}
+	
+	/**
+	 * Valida se algum médico da lista está disponível para esta consulta e retorna 1 deles caso haja
+	 * @throws RegistroNotFoundException 
+	 * */
+	private Long medicoDisponivelLista(List<Long> listaIds, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
+		Long idMedico = null;
+		for (Long id : listaIds) {
+			try {
+				medicoDisponivel(id, data,hora);
+				idMedico = id;
+				break;
+			} catch (MedicoUnavailableException e) {
+			}
+		}
+		if(idMedico == null) {
+			throw new RegistroNotFoundException("Médico dessa especialidade para essa data e hora");
+		}
+		return idMedico;
 	}
 }

@@ -55,11 +55,35 @@ public class ConsultaId implements Serializable {
 				&& Objects.equals(medicoId, other.medicoId) && Objects.equals(pacienteId, other.pacienteId);
 	}
 
-	public LocalDate getData() {
-		return this.data;
+	public Long getMedicoId() {
+		return medicoId;
 	}
-	
+
+	public void setMedicoId(Long medicoId) {
+		this.medicoId = medicoId;
+	}
+
+	public Long getPacienteId() {
+		return pacienteId;
+	}
+
+	public void setPacienteId(Long pacienteId) {
+		this.pacienteId = pacienteId;
+	}
+
+	public LocalDate getData() {
+		return data;
+	}
+
+	public void setData(LocalDate data) {
+		this.data = data;
+	}
+
 	public LocalTime getHora() {
-		return this.hora;
+		return hora;
+	}
+
+	public void setHora(LocalTime hora) {
+		this.hora = hora;
 	}
 }

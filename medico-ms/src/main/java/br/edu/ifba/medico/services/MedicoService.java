@@ -2,14 +2,12 @@ package br.edu.ifba.medico.services;
 
 
 import java.util.List;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import br.edu.ifba.medico.clients.EnderecoClient;
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import br.edu.ifba.medico.dtos.MedicoListar;
@@ -28,7 +26,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	private MedicoRepository medicoRepository;
 	
 	@Autowired
-	private EnderecoClient enderecoClient;
+	private EnderecoService enderecoService;
 	
 	@Override
 	public Page<MedicoListar> listarTodos(Pageable pageable) {
@@ -39,7 +37,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public void novoRegistro(MedicoEnviar dados) {
 		// Retorna o endereço que será usado pelo médico
-		Endereco endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
+		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
 		Medico medico = new Medico(dados, endereco);
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
@@ -67,7 +65,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		
 		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
 		if(dados.endereco() != null)
-			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
+			dadosPessoais.setEndereco(enderecoService.encontraPorDto(dados.endereco()));
 		
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
 		
@@ -94,11 +92,12 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	/**
 	 * Verifica se existem médicos com a especialidade indicada e retorna um aleatório
 	 * */
-	public Medico medicoAleatorioPorEspecialidade(Especialidade especialidade) throws RegistroNotFoundException {
-		List<Medico> lista = medicoRepository.findByEspecialidade(especialidade);
+	public List<Long> medicosPorEspecialidade(Especialidade especialidade) throws RegistroNotFoundException {
+		List<Medico> lista = medicoRepository.findByEspecialidadeAndAtivoTrue(especialidade);
 		if(lista.isEmpty()) {
 			throw new RegistroNotFoundException("Médico dessa especialidade");
 		}
-		return lista.get(new Random().nextInt());
+	
+		return lista.stream().map((medico) -> medico.getId()).toList();
 	}
 }

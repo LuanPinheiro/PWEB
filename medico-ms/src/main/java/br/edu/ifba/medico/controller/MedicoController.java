@@ -1,6 +1,7 @@
 package br.edu.ifba.medico.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,21 +79,21 @@ public class MedicoController {
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<Medico> encontrarPorId(@PathVariable Long id) 
+	public ResponseEntity<Long> encontrarPorId(@PathVariable Long id) 
 			throws RegistroNotFoundException {
 		
-		Medico medico = medicoService.encontrarPorId(id);
+		medicoService.encontrarPorId(id);
 		
-		return new ResponseEntity<>(medico,HttpStatus.OK);
+		return new ResponseEntity<>(id, HttpStatus.OK);
 	}
 	
 	@GetMapping("/encontrarPorEspecialidade/{especialidade}")
-	public ResponseEntity<Medico> encontrarPorEspecialidade(@PathVariable Especialidade especialidade) 
+	public ResponseEntity<List<Long>> encontrarPorEspecialidade(@PathVariable Especialidade especialidade) 
 			throws RegistroNotFoundException {
 		
-		Medico medico = medicoService.medicoAleatorioPorEspecialidade(especialidade);
+		List<Long> medicos = medicoService.medicosPorEspecialidade(especialidade);
 		
-		return new ResponseEntity<>(medico,HttpStatus.ACCEPTED);
+		return new ResponseEntity<>(medicos,HttpStatus.OK);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
