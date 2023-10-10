@@ -30,7 +30,7 @@ public class Paciente {
 		
 	}
 	
-	public Paciente(PacienteEnviar dados, Endereco endereco) {
+	public Paciente(PacienteEnviar dados, Long endereco) {
 		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.cpf = dados.cpf();
 	}

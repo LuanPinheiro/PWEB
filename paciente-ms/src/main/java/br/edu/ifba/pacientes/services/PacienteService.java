@@ -5,13 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.pacientes.clients.EnderecoClient;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
 import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
 import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
 import br.edu.ifba.pacientes.models.DadosPessoais;
-import br.edu.ifba.pacientes.models.Endereco;
 import br.edu.ifba.pacientes.models.Paciente;
 import br.edu.ifba.pacientes.repositories.PacienteRepository;
 
@@ -22,7 +22,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	private PacienteRepository pacienteRepository;
 	
 	@Autowired
-	private EnderecoService enderecoService;
+	private EnderecoClient enderecoClient;
 	
 	@Override
 	public Page<PacienteListar> listarTodos(Pageable pageable) {
@@ -33,8 +33,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	@Override
 	public void novoRegistro(PacienteEnviar dados) {
 		// Retorna o endereço que será usado pelo paciente
-		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
-		System.out.println(endereco.getId());
+		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
 		Paciente paciente = new Paciente(dados, endereco);
 		paciente.setAtivo(true);
 		pacienteRepository.save(paciente);
@@ -63,7 +62,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		
 		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
 		if(dados.endereco() != null)
-			dadosPessoais.setEndereco(enderecoService.encontraPorDto(dados.endereco()));
+			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
 		
 		pacienteRepository.save(paciente);
 	}

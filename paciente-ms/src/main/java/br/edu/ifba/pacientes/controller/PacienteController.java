@@ -31,6 +31,7 @@ import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
 import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
 import br.edu.ifba.pacientes.models.Paciente;
 import br.edu.ifba.pacientes.services.PacienteService;
+import feign.FeignException.FeignClientException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -93,6 +94,15 @@ public class PacienteController {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.put(fieldName, errorMessage);
 	    });
+	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(FeignClientException.class)
+	public Map<String, String> handleFeignClientException() {
+		
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Erro no service de Endereços");
 	    return errors;
 	}
 	

@@ -31,8 +31,8 @@ import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 import br.edu.ifba.medico.models.Especialidade;
-import br.edu.ifba.medico.models.Medico;
 import br.edu.ifba.medico.services.MedicoService;
+import feign.FeignException.FeignClientException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -111,11 +111,20 @@ public class MedicoController {
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(FeignClientException.class)
+	public Map<String, String> handleFeignClientException() {
+		
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Erro no service de Endereços");
+	    return errors;
+	}
+	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(RegistroNotFoundException.class)
-	public Map<String, String> handleRegistroNotFoundException() {
+	public Map<String, String> handleRegistroNotFoundException(RegistroNotFoundException ex) {
 	    
 		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Médico não encontrado");
+        errors.put("message", ex.getMessage());
 	    return errors;
 	}
 	

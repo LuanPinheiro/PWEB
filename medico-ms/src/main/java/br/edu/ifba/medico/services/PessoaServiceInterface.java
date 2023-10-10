@@ -6,6 +6,9 @@ import org.springframework.data.domain.Pageable;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 
+/**
+ * Interface para padronizar as operações de CRUD de entidades que sejam pessoas
+ * */
 public interface PessoaServiceInterface<Tabela, DtoEnviar, DtoListar, DtoAtualizar> {
 	/**
 	 * Lista todos os registros onde ativo = true

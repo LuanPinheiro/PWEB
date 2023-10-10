@@ -36,7 +36,7 @@ public class Medico {
 		
 	}
 	
-	public Medico(MedicoEnviar dados, Endereco endereco) {
+	public Medico(MedicoEnviar dados, Long endereco) {
 		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.crm = dados.crm();
 		this.especialidade = dados.especialidade();

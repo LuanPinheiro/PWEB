@@ -20,15 +20,14 @@ public class DadosPessoais {
 	@Column(nullable = false)
 	private String telefone;
 	
-	@ManyToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(nullable = false)
-	private Endereco endereco;
+	@Column(nullable = false, name = "endereco_id")
+	private Long endereco;
 	
 	public DadosPessoais() {
 		
 	}
 	
-	public DadosPessoais(DadosPessoaisDTO dados, Endereco endereco) {
+	public DadosPessoais(DadosPessoaisDTO dados, Long endereco) {
 		this.nome = dados.nome();
 		this.email = dados.email();
 		this.telefone = dados.telefone();
@@ -54,10 +53,10 @@ public class DadosPessoais {
 		this.telefone = telefone;
 	}
 
-	public Endereco getEndereco() {
+	public Long getEndereco() {
 		return endereco;
 	}
-	public void setEndereco(Endereco endereco) {
+	public void setEndereco(Long endereco) {
 		this.endereco = endereco;
 	}
 }

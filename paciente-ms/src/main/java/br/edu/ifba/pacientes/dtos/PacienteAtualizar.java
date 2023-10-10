@@ -2,6 +2,7 @@ package br.edu.ifba.pacientes.dtos;
 
 import org.hibernate.validator.constraints.br.CPF;
 
+import br.edu.ifba.pacientes.clients.EnderecoDTO;
 import jakarta.validation.Valid;
 
 public record PacienteAtualizar(

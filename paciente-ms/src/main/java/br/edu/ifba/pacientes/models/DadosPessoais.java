@@ -1,12 +1,8 @@
 package br.edu.ifba.pacientes.models;
 
 import br.edu.ifba.pacientes.dtos.DadosPessoaisDTO;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.Valid;
 
 @Embeddable
 public class DadosPessoais {
@@ -20,16 +16,14 @@ public class DadosPessoais {
 	@Column(nullable = false)
 	private String telefone;
 	
-	@ManyToOne(cascade = CascadeType.MERGE)
-	@JoinColumn(nullable = false)
-	@Valid
-	private Endereco endereco;
+	@Column(nullable = false, name = "id_endereco")
+	private Long endereco;
 	
 	public DadosPessoais() {
 		
 	}
 	
-	public DadosPessoais(DadosPessoaisDTO dados, Endereco endereco) {
+	public DadosPessoais(DadosPessoaisDTO dados, Long endereco) {
 		this.nome = dados.nome();
 		this.email = dados.email();
 		this.telefone = dados.telefone();
@@ -55,10 +49,10 @@ public class DadosPessoais {
 		this.telefone = telefone;
 	}
 
-	public Endereco getEndereco() {
+	public Long getEndereco() {
 		return endereco;
 	}
-	public void setEndereco(Endereco endereco) {
+	public void setEndereco(Long endereco) {
 		this.endereco = endereco;
 	}
 }

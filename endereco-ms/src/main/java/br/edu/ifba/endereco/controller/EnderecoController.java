@@ -23,7 +23,7 @@ public class EnderecoController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Endereco gerarEndereco(@Valid @RequestBody EnderecoDTO endereco) {
+	public Long gerarEndereco(@Valid @RequestBody EnderecoDTO endereco) {
 		return enderecoService.encontraPorDto(endereco);
 	}
 }

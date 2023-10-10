@@ -67,9 +67,7 @@ public class ConsultaService {
 				
 		Long paciente = validaPaciente(dados.idPaciente());
 
-		// Valida a data segundo as regras de negócio
 		this.validaData(data, hora);
-		// Valida a consulta segundo as regras de negócio
 		this.validaConsulta(medico, paciente, data, hora);
 		
 		consultaRepository.save(new Consulta(medico, paciente, data, hora));
@@ -121,7 +119,7 @@ public class ConsultaService {
 	}
 	
 	private void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
-		LocalTime agora = LocalTime.now();
+		LocalDateTime agora = LocalDateTime.now();
 		
 		// Validando se a data é num domingo
 		if(data.getDayOfWeek() == DayOfWeek.SUNDAY)
@@ -138,7 +136,7 @@ public class ConsultaService {
 		
 		
 		// Valida se a consulta está sendo feita com no mínimo 30min de antecedência
-		if(Duration.between(hora, agora).toMinutes() <= 30)
+		if(Duration.between(agora, LocalDateTime.of(data, hora)).toMinutes() <= 30)
 			throw new DataInvalidaException("Consulta só pode ser marcada com no mínimo 30 minutos de antecedência");
 	}
 	

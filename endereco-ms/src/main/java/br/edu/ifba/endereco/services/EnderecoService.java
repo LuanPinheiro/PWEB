@@ -13,7 +13,7 @@ public class EnderecoService {
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 	
-	public Endereco encontraPorDto(EnderecoDTO endereco) {
+	public Long encontraPorDto(EnderecoDTO endereco) {
 		// Busca se o endereco passado pelo cliente já existe no banco para não gerar tupla
 		Endereco enderecoFinal = enderecoRepository
 				.findByLogradouroAndNumeroAndComplementoAndBairroAndCidadeAndUfAndCep(
@@ -28,6 +28,6 @@ public class EnderecoService {
 				.orElseGet(() -> new Endereco(endereco));
 		
 		enderecoRepository.save(enderecoFinal);
-		return enderecoFinal;
+		return enderecoFinal.getId();
 	}
 }

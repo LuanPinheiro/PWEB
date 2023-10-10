@@ -8,13 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.medico.clients.EnderecoClient;
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 import br.edu.ifba.medico.models.DadosPessoais;
-import br.edu.ifba.medico.models.Endereco;
 import br.edu.ifba.medico.models.Especialidade;
 import br.edu.ifba.medico.models.Medico;
 import br.edu.ifba.medico.repositories.MedicoRepository;
@@ -26,7 +26,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	private MedicoRepository medicoRepository;
 	
 	@Autowired
-	private EnderecoService enderecoService;
+	private EnderecoClient enderecoClient;
 	
 	@Override
 	public Page<MedicoListar> listarTodos(Pageable pageable) {
@@ -37,7 +37,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public void novoRegistro(MedicoEnviar dados) {
 		// Retorna o endereço que será usado pelo médico
-		Endereco endereco = enderecoService.encontraPorDto(dados.dadosPessoais().endereco());
+		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
 		Medico medico = new Medico(dados, endereco);
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
@@ -65,7 +65,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		
 		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
 		if(dados.endereco() != null)
-			dadosPessoais.setEndereco(enderecoService.encontraPorDto(dados.endereco()));
+			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
 		
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
 		
