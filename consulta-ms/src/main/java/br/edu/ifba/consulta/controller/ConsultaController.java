@@ -83,16 +83,6 @@ public class ConsultaController {
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(FeignClientException.class)
-	public Map<String, String> handleFeignClientException(FeignClientException ex) {
-		String table = "Paciente";
-	    if(ex.getMessage().contains("Médico")) {
-	    	table = "Médico";
-	    }
-	    return handleRegistroNotFoundException(new RegistroNotFoundException(table));
-	}
-	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(RegistroNotFoundException.class)
 	public Map<String, String> handleRegistroNotFoundException(RegistroNotFoundException ex) {
 	    

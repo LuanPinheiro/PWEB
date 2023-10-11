@@ -26,13 +26,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
+import br.edu.ifba.medico.dtos.MedicoConsulta;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 import br.edu.ifba.medico.models.Especialidade;
+import br.edu.ifba.medico.models.Medico;
 import br.edu.ifba.medico.services.MedicoService;
-import feign.FeignException.FeignClientException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -79,21 +80,23 @@ public class MedicoController {
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<Long> encontrarPorId(@PathVariable Long id) 
+	public ResponseEntity<MedicoConsulta> encontrarPorId(@PathVariable Long id) 
 			throws RegistroNotFoundException {
 		
-		medicoService.encontrarPorId(id);
+		Medico medico = medicoService.encontrarPorId(id);
 		
-		return new ResponseEntity<>(id, HttpStatus.OK);
+		return new ResponseEntity<>(new MedicoConsulta(medico), HttpStatus.OK);
 	}
 	
 	@GetMapping("/encontrarPorEspecialidade/{especialidade}")
-	public ResponseEntity<List<Long>> encontrarPorEspecialidade(@PathVariable Especialidade especialidade) 
+	public ResponseEntity<List<MedicoConsulta>> encontrarPorEspecialidade(@PathVariable Especialidade especialidade) 
 			throws RegistroNotFoundException {
 		
-		List<Long> medicos = medicoService.medicosPorEspecialidade(especialidade);
+		List<MedicoConsulta> medicos = medicoService.medicosPorEspecialidade(especialidade)
+										.stream()
+										.map((medico) -> new MedicoConsulta(medico)).toList();
 		
-		return new ResponseEntity<>(medicos,HttpStatus.OK);
+		return new ResponseEntity<>(medicos, HttpStatus.OK);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -107,15 +110,6 @@ public class MedicoController {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.put(fieldName, errorMessage);
 	    });
-	    return errors;
-	}
-	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(FeignClientException.class)
-	public Map<String, String> handleFeignClientException() {
-		
-		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Erro no service de Endereços");
 	    return errors;
 	}
 	

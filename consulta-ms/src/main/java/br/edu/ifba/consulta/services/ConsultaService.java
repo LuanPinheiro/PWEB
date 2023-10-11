@@ -10,11 +10,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.consulta.clients.EmailClient;
+import br.edu.ifba.consulta.clients.EmailDto;
 import br.edu.ifba.consulta.clients.Especialidade;
 import br.edu.ifba.consulta.clients.MedicoClient;
+import br.edu.ifba.consulta.clients.MedicoConsulta;
+import br.edu.ifba.consulta.clients.PacientaConsulta;
 import br.edu.ifba.consulta.clients.PacienteClient;
 import br.edu.ifba.consulta.dtos.ConsultaCancelar;
 import br.edu.ifba.consulta.dtos.ConsultaEnviar;
@@ -42,6 +45,8 @@ public class ConsultaService {
 	@Autowired
 	private PacienteClient pacienteClient;
 	
+	@Autowired
+	private EmailClient emailClient;
 	
 	public List<ConsultaListar> converteLista(List<Consulta> lista){
 		// Convertendo cada registro de uma query para um DTO de listagem
@@ -63,25 +68,28 @@ public class ConsultaService {
 		LocalDate data = dados.data();
 		LocalTime hora = dados.hora();
 		
-		Long medico = validaMedico(dados.idMedico(), dados.especialidade(), data, hora);
+		MedicoConsulta medico = validaMedico(dados.idMedico(), dados.especialidade(), data, hora);
 				
-		Long paciente = validaPaciente(dados.idPaciente());
+		PacientaConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
 
-		this.validaData(data, hora);
-		this.validaConsulta(medico, paciente, data, hora);
+		validaData(data, hora);
+		Consulta consulta = validaConsulta(medico.id(), paciente.id(), data, hora);
 		
-		consultaRepository.save(new Consulta(medico, paciente, data, hora));
-	}
-	
-	private Long validaPaciente(Long idPaciente) throws RegistroNotFoundException {
-		ResponseEntity<?> resposta = pacienteClient.encontrarPorId(idPaciente);
-		
-		return (Long) resposta.getBody();
+		consultaRepository.save(consulta);
+		emailClient.sendEmail(new EmailDto(
+				"email@gmail.com",
+				paciente.email(),
+				"Consulta marcada",
+				"Olá " + paciente.nome() + 
+				"\nSua consulta da especialidade " + medico.especialidade() + 
+				" com o médico " + medico.nome() + 
+				" foi agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora()));
 	}
 
-	private Long validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
+	private MedicoConsulta validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
 		if(idMedico == null) {
-			List<Long> medicos = medicoClient.encontrarPorEspecialidade(especialidade).getBody();
+			List<MedicoConsulta> medicos = medicoClient.encontrarPorEspecialidade(especialidade).getBody();
 			return medicoDisponivelLista(medicos, data, hora);
 		}
 		
@@ -92,10 +100,13 @@ public class ConsultaService {
 			throws RegistroNotFoundException,
 			ConsultaNotFoundException,
 			CantCancelConsultaException {
-		// Recupera a consulta no banco
+		MedicoConsulta medico = medicoClient.encontrarPorId(dados.idMedico()).getBody();
+		
+		PacientaConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
+		
 		Consulta consulta = this.encontrarPorIds(new ConsultaId(
-				dados.idMedico(),
-				dados.idPaciente(),
+				medico.id(),
+				paciente.id(),
 				dados.data(),
 				dados.hora())).orElseThrow(() -> new ConsultaNotFoundException("Essa consulta não foi agendada"));
 		
@@ -115,7 +126,15 @@ public class ConsultaService {
 		consulta.setDesmarcado(true);
 		consulta.setMotivo(dados.motivo());
 		consultaRepository.save(consulta);
-		
+		emailClient.sendEmail(new EmailDto(
+				"email@gmail.com",
+				paciente.email(),
+				"Consulta desmarcada",
+				"Olá " + paciente.nome() +
+				"\nSua consulta da especialidade " + medico.especialidade() + 
+				" com o médico " + medico.nome() + 
+				" que estava agendada para o dia " + consulta.getData() + 
+				" foi cancelada"));
 	}
 	
 	private void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
@@ -140,36 +159,46 @@ public class ConsultaService {
 			throw new DataInvalidaException("Consulta só pode ser marcada com no mínimo 30 minutos de antecedência");
 	}
 	
-	private void validaConsulta(Long medico, Long paciente, LocalDate data, LocalTime hora) 
+	private Consulta validaConsulta(Long medico, Long paciente, LocalDate data, LocalTime hora) 
 			throws ConsultaExistenteException,
 			PacienteJaAgendadoException,
 			MedicoUnavailableException {
-		consultaExiste(new ConsultaId(medico, paciente, data, hora));
+		Consulta consulta = consultaExiste(new ConsultaId(medico, paciente, data, hora));
 		medicoDisponivel(medico, data, hora);
 		pacienteTemConsulta(paciente, data);
+		
+		// Caso essa consulta não exista no banco, cria um novo registro
+		if(consulta == null) {
+			consulta = new Consulta(medico, paciente, data, hora);
+		}
+		// Se a consulta foi criada agora ou já existia, muda o valor de desmarcado para false, garantindo que ela está marcada
+		consulta.setDesmarcado(false);
+		return consulta;
 	}
 	
 	/**
-	 * Valida se a consulta já existe
+	 * Valida se a consulta já existe e a retorna
 	 * */
-	private void consultaExiste(ConsultaId ids) throws ConsultaExistenteException{
-		if(encontrarPorIds(ids).isPresent()) {
+	private Consulta consultaExiste(ConsultaId ids) throws ConsultaExistenteException{
+		Optional<Consulta> consulta = encontrarPorIds(ids);
+		if(consulta.isPresent() && consulta.get().isDesmarcado() == false) {
 			throw new ConsultaExistenteException();
 		}
+		return consulta.isPresent() ? consulta.get() : null;
 	}
 	
 	/**
 	 * Encontra uma consulta com os dados da chave primária composta
 	 * */
 	private Optional<Consulta> encontrarPorIds(ConsultaId ids) {
-		return consultaRepository.findByIds(ids);
+		return consultaRepository.findByIdsAndDesmarcadoFalse(ids);
 	}
 
 	/**
 	 * Valida se o paciente já tem consulta no dia
 	 * */
 	private void pacienteTemConsulta(Long id, LocalDate data) throws PacienteJaAgendadoException {
-		if(consultaRepository.findByIdsDataAndIdsPacienteId(data, id).isPresent()) {
+		if(consultaRepository.findByIdsDataAndIdsPacienteIdAndDesmarcadoFalse(data, id).isPresent()) {
 			throw new PacienteJaAgendadoException();
 		}
 	}
@@ -187,19 +216,19 @@ public class ConsultaService {
 	 * Valida se algum médico da lista está disponível para esta consulta e retorna 1 deles caso haja
 	 * @throws RegistroNotFoundException 
 	 * */
-	private Long medicoDisponivelLista(List<Long> listaIds, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
-		Long idMedico = null;
-		for (Long id : listaIds) {
+	private MedicoConsulta medicoDisponivelLista(List<MedicoConsulta> medicos, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
+		MedicoConsulta medicoAvailable = null;
+		for (MedicoConsulta medico : medicos) {
 			try {
-				medicoDisponivel(id, data,hora);
-				idMedico = id;
+				medicoDisponivel(medico.id(), data,hora);
+				medicoAvailable = medico;
 				break;
 			} catch (MedicoUnavailableException e) {
 			}
 		}
-		if(idMedico == null) {
+		if(medicoAvailable == null) {
 			throw new RegistroNotFoundException("Médico dessa especialidade para essa data e hora");
 		}
-		return idMedico;
+		return medicoAvailable;
 	}
 }

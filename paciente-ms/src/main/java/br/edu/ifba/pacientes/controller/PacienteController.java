@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.edu.ifba.pacientes.dtos.PacientaConsulta;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
@@ -31,7 +32,6 @@ import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
 import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
 import br.edu.ifba.pacientes.models.Paciente;
 import br.edu.ifba.pacientes.services.PacienteService;
-import feign.FeignException.FeignClientException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -75,12 +75,12 @@ public class PacienteController {
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<Long> encontrarPorId(@PathVariable Long id) 
+	public ResponseEntity<PacientaConsulta> encontrarPorId(@PathVariable Long id) 
 			throws RegistroNotFoundException {
 		
 		Paciente paciente = pacienteService.encontrarPorId(id);
 		
-		return new ResponseEntity<>(paciente.getId(),HttpStatus.OK);
+		return new ResponseEntity<>(new PacientaConsulta(paciente),HttpStatus.OK);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -94,15 +94,6 @@ public class PacienteController {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.put(fieldName, errorMessage);
 	    });
-	    return errors;
-	}
-	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(FeignClientException.class)
-	public Map<String, String> handleFeignClientException() {
-		
-		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Erro no service de Endereços");
 	    return errors;
 	}
 	

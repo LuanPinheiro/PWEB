@@ -90,14 +90,14 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	}
 
 	/**
-	 * Verifica se existem médicos com a especialidade indicada e retorna um aleatório
+	 * Verifica se existem médicos com a especialidade indicada e retorna uma lista dos encontrados
 	 * */
-	public List<Long> medicosPorEspecialidade(Especialidade especialidade) throws RegistroNotFoundException {
+	public List<Medico> medicosPorEspecialidade(Especialidade especialidade) throws RegistroNotFoundException {
 		List<Medico> lista = medicoRepository.findByEspecialidadeAndAtivoTrue(especialidade);
 		if(lista.isEmpty()) {
 			throw new RegistroNotFoundException("Médico dessa especialidade");
 		}
 	
-		return lista.stream().map((medico) -> medico.getId()).toList();
+		return lista;
 	}
 }

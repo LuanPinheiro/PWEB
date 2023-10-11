@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifba.endereco.dtos.EnderecoDTO;
-import br.edu.ifba.endereco.models.Endereco;
 import br.edu.ifba.endereco.services.EnderecoService;
 import jakarta.validation.Valid;
 

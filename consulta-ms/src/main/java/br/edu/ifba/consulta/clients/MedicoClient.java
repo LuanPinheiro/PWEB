@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface MedicoClient {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/medicos/encontrarPorId/{id}")
-	public ResponseEntity<Long> encontrarPorId(@PathVariable Long id);
+	public ResponseEntity<MedicoConsulta> encontrarPorId(@PathVariable Long id);
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/medicos/encontrarPorEspecialidade/{especialidade}")
-	public ResponseEntity<List<Long>> encontrarPorEspecialidade(@PathVariable Especialidade especialidade);
+	public ResponseEntity<List<MedicoConsulta>> encontrarPorEspecialidade(@PathVariable Especialidade especialidade);
 }
