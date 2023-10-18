@@ -85,6 +85,15 @@ public class ConsultaService {
 				" com o médico " + medico.nome() + 
 				" foi agendada para o dia " + consulta.getData() + 
 				" às " + consulta.getHora()));
+		
+		emailClient.sendEmail(new EmailDto(
+				"email@gmail.com",
+				medico.email(),
+				"Consulta marcada",
+				"Olá " + medico.nome() + 
+				"\nUma consulta com o paciente " + paciente.nome() + 
+				" foi agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora()));
 	}
 
 	private MedicoConsulta validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
@@ -134,6 +143,17 @@ public class ConsultaService {
 				"\nSua consulta da especialidade " + medico.especialidade() + 
 				" com o médico " + medico.nome() + 
 				" que estava agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora() +
+				" foi cancelada"));
+		
+		emailClient.sendEmail(new EmailDto(
+				"email@gmail.com",
+				medico.email(),
+				"Consulta desmarcada",
+				"Olá " + medico.nome() +
+				"\nA consulta com o paciente " + paciente.nome() + 
+				" que estava agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora() +
 				" foi cancelada"));
 	}
 	
