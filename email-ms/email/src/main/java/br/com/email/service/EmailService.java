@@ -20,7 +20,7 @@ public class EmailService {
 	@Autowired
 	private EmailRepository repository;
 	
-	public EmailDto sendEmail(EmailDto dto) {
+	public void sendEmail(EmailDto dto) {
 		Email email= new Email(dto);
 		email.setSendDateEmail(LocalDateTime.now());
 		email.setStatus(EmailStatus.SENT);
@@ -33,8 +33,5 @@ public class EmailService {
 		
 		emailSennder.send(message);
 		repository.save(email);
-		return dto;
 	}
-
-	
 }

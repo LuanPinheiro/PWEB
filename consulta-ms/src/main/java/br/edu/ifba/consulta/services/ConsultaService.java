@@ -9,16 +9,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.edu.ifba.consulta.clients.EmailClient;
-import br.edu.ifba.consulta.clients.EmailDto;
+import br.edu.ifba.consulta.amqp.EmailDto;
 import br.edu.ifba.consulta.clients.Especialidade;
 import br.edu.ifba.consulta.clients.MedicoClient;
 import br.edu.ifba.consulta.clients.MedicoConsulta;
-import br.edu.ifba.consulta.clients.PacientaConsulta;
 import br.edu.ifba.consulta.clients.PacienteClient;
+import br.edu.ifba.consulta.clients.PacienteConsulta;
 import br.edu.ifba.consulta.dtos.ConsultaCancelar;
 import br.edu.ifba.consulta.dtos.ConsultaEnviar;
 import br.edu.ifba.consulta.dtos.ConsultaListar;
@@ -46,7 +46,7 @@ public class ConsultaService {
 	private PacienteClient pacienteClient;
 	
 	@Autowired
-	private EmailClient emailClient;
+    private RabbitTemplate rabbitTemplate;
 	
 	public List<ConsultaListar> converteLista(List<Consulta> lista){
 		// Convertendo cada registro de uma query para um DTO de listagem
@@ -70,30 +70,13 @@ public class ConsultaService {
 		
 		MedicoConsulta medico = validaMedico(dados.idMedico(), dados.especialidade(), data, hora);
 				
-		PacientaConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
+		PacienteConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
 
 		validaData(data, hora);
 		Consulta consulta = validaConsulta(medico.id(), paciente.id(), data, hora);
 		
 		consultaRepository.save(consulta);
-		emailClient.sendEmail(new EmailDto(
-				"email@gmail.com",
-				paciente.email(),
-				"Consulta marcada",
-				"Olá " + paciente.nome() + 
-				"\nSua consulta da especialidade " + medico.especialidade() + 
-				" com o médico " + medico.nome() + 
-				" foi agendada para o dia " + consulta.getData() + 
-				" às " + consulta.getHora()));
-		
-		emailClient.sendEmail(new EmailDto(
-				"email@gmail.com",
-				medico.email(),
-				"Consulta marcada",
-				"Olá " + medico.nome() + 
-				"\nUma consulta com o paciente " + paciente.nome() + 
-				" foi agendada para o dia " + consulta.getData() + 
-				" às " + consulta.getHora()));
+		enviarEmailsMarcar(medico, paciente, consulta);
 	}
 
 	private MedicoConsulta validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
@@ -104,6 +87,48 @@ public class ConsultaService {
 		
 		return medicoClient.encontrarPorId(idMedico).getBody();
 	}
+	
+	private void enviarEmailsMarcar(MedicoConsulta medico, PacienteConsulta paciente, Consulta consulta) {
+		rabbitTemplate.convertAndSend("email_enviar_ex","",new EmailDto(
+				"email@gmail.com",
+				paciente.email(),
+				"Consulta marcada",
+				"Olá " + paciente.nome() + 
+				"\nSua consulta da especialidade " + medico.especialidade() + 
+				" com o médico " + medico.nome() + 
+				" foi agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora()));
+		rabbitTemplate.convertAndSend("email_enviar_ex","",new EmailDto(
+				"email@gmail.com",
+				medico.email(),
+				"Consulta marcada",
+				"Olá " + medico.nome() + 
+				"\nUma consulta com o paciente " + paciente.nome() + 
+				" foi agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora()));
+	}
+	
+	private void enviarEmailsDesmarcar(MedicoConsulta medico, PacienteConsulta paciente, Consulta consulta) {
+		rabbitTemplate.convertAndSend("email_enviar_ex","",new EmailDto(
+				"email@gmail.com",
+				paciente.email(),
+				"Consulta desmarcada",
+				"Olá " + paciente.nome() +
+				"\nSua consulta da especialidade " + medico.especialidade() + 
+				" com o médico " + medico.nome() + 
+				" que estava agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora() +
+				" foi cancelada"));
+		rabbitTemplate.convertAndSend("email_enviar_ex","",new EmailDto(
+				"email@gmail.com",
+				medico.email(),
+				"Consulta desmarcada",
+				"Olá " + medico.nome() +
+				"\nA consulta com o paciente " + paciente.nome() + 
+				" que estava agendada para o dia " + consulta.getData() + 
+				" às " + consulta.getHora() +
+				" foi cancelada"));
+	}
 
 	public void cancelarConsulta(ConsultaCancelar dados) 
 			throws RegistroNotFoundException,
@@ -111,7 +136,7 @@ public class ConsultaService {
 			CantCancelConsultaException {
 		MedicoConsulta medico = medicoClient.encontrarPorId(dados.idMedico()).getBody();
 		
-		PacientaConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
+		PacienteConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
 		
 		Consulta consulta = this.encontrarPorIds(new ConsultaId(
 				medico.id(),
@@ -135,26 +160,7 @@ public class ConsultaService {
 		consulta.setDesmarcado(true);
 		consulta.setMotivo(dados.motivo());
 		consultaRepository.save(consulta);
-		emailClient.sendEmail(new EmailDto(
-				"email@gmail.com",
-				paciente.email(),
-				"Consulta desmarcada",
-				"Olá " + paciente.nome() +
-				"\nSua consulta da especialidade " + medico.especialidade() + 
-				" com o médico " + medico.nome() + 
-				" que estava agendada para o dia " + consulta.getData() + 
-				" às " + consulta.getHora() +
-				" foi cancelada"));
-		
-		emailClient.sendEmail(new EmailDto(
-				"email@gmail.com",
-				medico.email(),
-				"Consulta desmarcada",
-				"Olá " + medico.nome() +
-				"\nA consulta com o paciente " + paciente.nome() + 
-				" que estava agendada para o dia " + consulta.getData() + 
-				" às " + consulta.getHora() +
-				" foi cancelada"));
+		enviarEmailsDesmarcar(medico, paciente, consulta);
 	}
 	
 	private void validaData(LocalDate data, LocalTime hora) throws DataInvalidaException {
