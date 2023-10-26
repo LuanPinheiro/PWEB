@@ -30,13 +30,11 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	
 	@Override
 	public Page<MedicoListar> listarTodos(Pageable pageable) {
-		// Retorna os registros do banco em forma de DTO
 		return medicoRepository.findByAtivoTrue(pageable).map(MedicoListar::new);
 	}
 	
 	@Override
 	public void novoRegistro(MedicoEnviar dados) {
-		// Retorna o endereço que será usado pelo médico
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
 		Medico medico = new Medico(dados, endereco);
 		medico.setAtivo(true);
@@ -46,7 +44,6 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public void removeRegistro(Long id) throws RegistroNotFoundException {
 		Medico medico = this.encontrarPorId(id);
-		// Apaga o registro logicamente, mudando o valor de ativo
 		medico.setAtivo(false);
 		medicoRepository.save(medico);
 	}
@@ -60,10 +57,8 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		Medico medico = encontrarPorId(id);
 		
 		DadosPessoais dadosPessoais = medico.getDadosPessoais();
-		// Altera os valores que foram passados no request body
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
 		
-		// Caso endereço seja passado é necessário um tratamento especial para não gerar tuplas de endereços
 		if(dados.endereco() != null)
 			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
 		

@@ -67,7 +67,7 @@ public class PacienteController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removeMedico(@PathVariable Long id) throws RegistroNotFoundException {
+	public ResponseEntity<?> removePaciente(@PathVariable Long id) throws RegistroNotFoundException {
 		
 		pacienteService.removeRegistro(id);
 		
@@ -83,9 +83,8 @@ public class PacienteController {
 		return new ResponseEntity<>(new PacientaConsulta(paciente),HttpStatus.OK);
 	}
 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public Map<String, String> handleValidationExceptions(
+	public ResponseEntity<?> handleValidationExceptions(
 	  MethodArgumentNotValidException ex) {
 	    
 		Map<String, String> errors = new HashMap<String, String>();
@@ -94,24 +93,6 @@ public class PacienteController {
 	        String errorMessage = error.getDefaultMessage();
 	        errors.put(fieldName, errorMessage);
 	    });
-	    return errors;
-	}
-	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(RegistroNotFoundException.class)
-	public Map<String, String> handleRegistroNotFoundException() {
-	    
-		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Paciente não encontrado");
-	    return errors;
-	}
-	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(InvalidFieldsException.class)
-	public Map<String, String> handleInvalidFieldsException() {
-	    
-		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Campos inválidos ou nulos");
-	    return errors;
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 }
