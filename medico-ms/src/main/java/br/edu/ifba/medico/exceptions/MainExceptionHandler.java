@@ -1,4 +1,4 @@
-package br.edu.ifba.pacientes.exceptions;
+package br.edu.ifba.medico.exceptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<?> handleRegistroNotFoundException() {
 	    
 		Map<String, String> errors = new HashMap<String, String>();
-        errors.put("message", "Paciente não encontrado");
+        errors.put("message", "Médico não encontrado");
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	

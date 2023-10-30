@@ -45,7 +45,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding bindPagamentoPedido(FanoutExchange fanoutExchange) {
+    public Binding bindEmailEnviar(FanoutExchange fanoutExchange) {
         return BindingBuilder
                 .bind(filaEmails())
                 .to(fanoutExchange());
