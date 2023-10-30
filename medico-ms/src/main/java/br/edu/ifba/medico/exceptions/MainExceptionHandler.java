@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
@@ -34,14 +35,22 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<Object> handleMethodArgumentTypeMismatchException() {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "Especialidade Inválida");
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
+	
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 			HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request){
 		Map<String, String> errors = new HashMap<String, String>();
-		if(!ex.getMessage().contains("Especialidade")) {
-			errors.put("message", ex.getMessage());
+		if(ex.getMessage().contains("Especialidade")) {
+			return handleMethodArgumentTypeMismatchException();			
 		}
-        errors.put("message", "Especialidade Inválida");
+        errors.put("message", ex.getMessage());
 		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	

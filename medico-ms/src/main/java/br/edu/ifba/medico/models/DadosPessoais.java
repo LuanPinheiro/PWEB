@@ -1,12 +1,8 @@
 package br.edu.ifba.medico.models;
 
 import br.edu.ifba.medico.dtos.DadosPessoaisDTO;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.Valid;
 
 @Embeddable
 public class DadosPessoais {
