@@ -1,7 +1,7 @@
 package br.edu.ifba.medico.exceptions;
 
 @SuppressWarnings("serial")
-public class RegistroNotFoundException extends Exception {
+public class RegistroNotFoundException extends RuntimeException {
 	String table_name;
 
 	public RegistroNotFoundException(String table_name) {

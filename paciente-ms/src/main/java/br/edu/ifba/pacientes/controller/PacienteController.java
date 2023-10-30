@@ -2,9 +2,6 @@ package br.edu.ifba.pacientes.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,9 +19,6 @@ import br.edu.ifba.pacientes.dtos.PacientaConsulta;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
-import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
-import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
-import br.edu.ifba.pacientes.models.Paciente;
 import br.edu.ifba.pacientes.services.PacienteService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -37,43 +31,35 @@ public class PacienteController {
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public Page<PacienteListar> listarPacientes(@RequestParam("page") int page) {
-		final Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome"));
-		return pacienteService.listarTodos(pageable);
+	public Page<PacienteListar> listarPacientes(@RequestParam(name="page", required=false) Integer page) {
+		return pacienteService.listarTodos(page);
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public void novoPaciente(@Valid @RequestBody PacienteEnviar dadosPaciente){
-		
 		pacienteService.novoRegistro(dadosPaciente);
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<?> atualizaPaciente(
 			@NotNull @Valid @RequestBody PacienteAtualizar dadosPaciente,
-			@PathVariable Long id) 
-				throws RegistroNotFoundException, InvalidFieldsException {
+			@PathVariable Long id){
 		
 		pacienteService.atualizaRegistro(dadosPaciente, id);
-		
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removePaciente(@PathVariable Long id) throws RegistroNotFoundException {
+	public ResponseEntity<?> removePaciente(@PathVariable Long id){
 		
 		pacienteService.removeRegistro(id);
-		
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<PacientaConsulta> encontrarPorId(@PathVariable Long id) 
-			throws RegistroNotFoundException {
+	public ResponseEntity<PacientaConsulta> encontrarPorId(@PathVariable Long id){
 		
-		Paciente paciente = pacienteService.encontrarPorId(id);
-		
-		return new ResponseEntity<>(new PacientaConsulta(paciente),HttpStatus.OK);
+		return new ResponseEntity<>(new PacientaConsulta(pacienteService.encontrarPorId(id)),HttpStatus.OK);
 	}
 }

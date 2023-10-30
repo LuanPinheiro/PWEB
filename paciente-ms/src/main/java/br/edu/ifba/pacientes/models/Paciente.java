@@ -33,6 +33,7 @@ public class Paciente {
 	public Paciente(PacienteEnviar dados, Long endereco) {
 		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.cpf = dados.cpf();
+		this.ativo = false;
 	}
 
 	public DadosPessoais getDadosPessoais() {
@@ -51,7 +52,7 @@ public class Paciente {
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
-	public Boolean getAtivo() {
+	public Boolean isAtivo() {
 		return ativo;
 	}
 	public void setAtivo(Boolean ativo) {

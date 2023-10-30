@@ -12,4 +12,5 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
 	public Optional<Paciente> findByIdAndAtivoTrue(Long id);
 	public Page<Paciente> findByAtivoTrue(Pageable pageable);
+	public Optional<Paciente> findByCpf(String cpf);
 }

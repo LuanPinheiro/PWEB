@@ -40,6 +40,7 @@ public class Medico {
 		this.dadosPessoais = new DadosPessoais(dados.dadosPessoais(), endereco);
 		this.crm = dados.crm();
 		this.especialidade = dados.especialidade();
+		this.ativo = false;
 	}
 	
 	public Long getId() {
@@ -63,7 +64,7 @@ public class Medico {
 	public void setEspecialidade(Especialidade especialidade) {
 		this.especialidade = especialidade;
 	}
-	public Boolean getAtivo() {
+	public Boolean isAtivo() {
 		return ativo;
 	}
 	public void setAtivo(Boolean ativo) {

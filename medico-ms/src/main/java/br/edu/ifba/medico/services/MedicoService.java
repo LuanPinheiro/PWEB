@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.medico.clients.EnderecoClient;
@@ -13,6 +14,7 @@ import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.exceptions.InvalidFieldsException;
+import br.edu.ifba.medico.exceptions.RegistroExistenteException;
 import br.edu.ifba.medico.exceptions.RegistroNotFoundException;
 import br.edu.ifba.medico.models.DadosPessoais;
 import br.edu.ifba.medico.models.Especialidade;
@@ -29,14 +31,19 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	private EnderecoClient enderecoClient;
 	
 	@Override
-	public Page<MedicoListar> listarTodos(Pageable pageable) {
-		return medicoRepository.findByAtivoTrue(pageable).map(MedicoListar::new);
+	public Page<MedicoListar> listarTodos(Integer page) {
+		return medicoRepository
+				.findByAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")))
+				.map(MedicoListar::new);
 	}
 	
 	@Override
-	public void novoRegistro(MedicoEnviar dados) {
+	public void novoRegistro(MedicoEnviar dados) throws RegistroExistenteException {
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
-		Medico medico = new Medico(dados, endereco);
+		Medico medico = medicoRepository.findByCrm(dados.crm()).orElse(new Medico(dados, endereco));
+		if(medico.isAtivo()) {
+			throw new RegistroExistenteException();
+		}
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
 	}

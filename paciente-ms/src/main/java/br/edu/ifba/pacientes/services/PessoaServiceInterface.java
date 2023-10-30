@@ -1,9 +1,9 @@
 package br.edu.ifba.pacientes.services;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
+import br.edu.ifba.pacientes.exceptions.RegistroExistenteException;
 import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
 
 /**
@@ -13,12 +13,12 @@ public interface PessoaServiceInterface<Tabela, DtoEnviar, DtoListar, DtoAtualiz
 	/**
 	 * Lista todos os registros onde ativo = true
 	 * */
-	public Page<DtoListar> listarTodos(Pageable pageable);
+	public Page<DtoListar> listarTodos(Integer page);
 	
 	/**
 	 * Gera um novo registro no banco caso não seja uma tupla
 	 * */
-	public void novoRegistro(DtoEnviar dados);
+	public void novoRegistro(DtoEnviar dados) throws RegistroExistenteException;
 	
 	/**
 	 * Apaga um registro dado um id na tabela caso ele exista e ativo = true

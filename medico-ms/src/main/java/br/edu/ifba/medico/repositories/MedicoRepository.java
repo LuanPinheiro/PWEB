@@ -16,4 +16,5 @@ public interface MedicoRepository extends JpaRepository<Medico, Long>{
 	public Optional<Medico> findByIdAndAtivoTrue(Long id);
 	public List<Medico> findByEspecialidadeAndAtivoTrue(Especialidade especialidade);
 	public Page<Medico> findByAtivoTrue(Pageable pageable);
+	public Optional<Medico> findByCrm(String crm);
 }

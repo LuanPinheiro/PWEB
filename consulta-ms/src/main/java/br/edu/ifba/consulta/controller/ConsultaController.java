@@ -38,22 +38,14 @@ public class ConsultaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> marcarConsulta(@Valid @RequestBody ConsultaEnviar dados) 
-			throws RegistroNotFoundException,
-			DataInvalidaException,
-			ConsultaExistenteException,
-			PacienteJaAgendadoException,
-			MedicoUnavailableException{
+	public ResponseEntity<?> marcarConsulta(@Valid @RequestBody ConsultaEnviar dados){
 		
 		consultaService.marcarConsulta(dados);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<?> cancelarConsulta(@Valid @RequestBody ConsultaCancelar dados) 
-			throws RegistroNotFoundException,
-			ConsultaNotFoundException,
-			CantCancelConsultaException{
+	public ResponseEntity<?> cancelarConsulta(@Valid @RequestBody ConsultaCancelar dados){
 		
 		consultaService.cancelarConsulta(dados);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);

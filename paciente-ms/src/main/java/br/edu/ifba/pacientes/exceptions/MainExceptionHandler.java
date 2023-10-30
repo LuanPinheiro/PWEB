@@ -33,6 +33,14 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	
+	@ExceptionHandler(RegistroExistenteException.class)
+	public ResponseEntity<?> handleRegistroExistenteException() {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+        errors.put("message", "CPF já registrado com outro paciente");
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
+	
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex,

@@ -2,7 +2,8 @@ package br.edu.ifba.pacientes.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.pacientes.clients.EnderecoClient;
@@ -10,6 +11,7 @@ import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
 import br.edu.ifba.pacientes.exceptions.InvalidFieldsException;
+import br.edu.ifba.pacientes.exceptions.RegistroExistenteException;
 import br.edu.ifba.pacientes.exceptions.RegistroNotFoundException;
 import br.edu.ifba.pacientes.models.DadosPessoais;
 import br.edu.ifba.pacientes.models.Paciente;
@@ -25,14 +27,19 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	private EnderecoClient enderecoClient;
 	
 	@Override
-	public Page<PacienteListar> listarTodos(Pageable pageable) {
-		return pacienteRepository.findByAtivoTrue(pageable).map(PacienteListar::new);
+	public Page<PacienteListar> listarTodos(Integer page) {
+		return pacienteRepository
+				.findByAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")))
+				.map(PacienteListar::new);
 	}
 
 	@Override
-	public void novoRegistro(PacienteEnviar dados) {
+	public void novoRegistro(PacienteEnviar dados) throws RegistroExistenteException {
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
-		Paciente paciente = new Paciente(dados, endereco);
+		Paciente paciente = pacienteRepository.findByCpf(dados.cpf()).orElse(new Paciente(dados, endereco));
+		if(paciente.isAtivo()) {
+			throw new RegistroExistenteException();
+		}
 		paciente.setAtivo(true);
 		pacienteRepository.save(paciente);
 	}
@@ -75,6 +82,6 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
-		return pacienteRepository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegistroNotFoundException("Paciente"));
+		return pacienteRepository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegistroNotFoundException());
 	}
 }
