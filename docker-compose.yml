@@ -14,7 +14,7 @@ services:
             - RABBITMQ_DEFAULT_USER=guest
             - RABBITMQ_DEFAULT_PASS=guest
     db:
-      platform: linux/x86_64
+      container_name: db
       image: mysql:latest
       restart: always
       environment:
@@ -25,5 +25,90 @@ services:
          - '3306'
       volumes:
         - my-db:/var/lib/mysql
+
+    server:
+        container_name: eureka-server
+        build: ./server
+        ports: 
+          - 8083:8083
+        networks:
+            - spring-cloud-network
+
+    gateway:
+        container_name: eureka-gateway
+        build: ./gateway
+        ports: 
+          - 8084:8084
+        depends_on:
+          - server
+        networks:
+            - spring-cloud-network
+        environment:
+          - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
+
+    endereco-ms:
+        container_name: eureka-enderecos
+        build: ./endereco-ms
+        depends_on:
+          - gateway
+        networks:
+            - spring-cloud-network
+        environment:
+          - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/enderecos?createDatabaseIfNotExist=true
+
+    medico-ms:
+        container_name: eureka-medicos
+        build: ./medico-ms
+        depends_on:
+          - gateway
+          - endereco-ms
+        networks:
+            - spring-cloud-network
+        environment:
+          - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/medicos?createDatabaseIfNotExist=true
+
+    paciente-ms:
+        container_name: eureka-pacientes
+        build: ./paciente-ms
+        depends_on:
+          - gateway
+          - endereco-ms
+        networks:
+            - spring-cloud-network
+        environment:
+          - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/pacientes?createDatabaseIfNotExist=true
+
+    consulta-ms:
+        container_name: eureka-consultas
+        build: ./consulta-ms
+        depends_on:
+          - gateway
+        networks:
+            - spring-cloud-network
+        environment:
+          - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/consultas?createDatabaseIfNotExist=true
+          - SPRING_RABBITMQ_HOST=10.102.17.76
+
+    email-ms:
+        container_name: emails
+        build: ./email-ms/email
+        depends_on:
+          - rabbitmq
+        networks:
+            - spring-cloud-network
+        environment:
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/emails?createDatabaseIfNotExist=true
+          - SPRING_MAIL_USERNAME=qastudent.trilhas@gmail.com
+          - SPRING_MAIL_PASSWORD=fdndhmlobajbmktw
+          - SPRING_RABBITMQ_HOST=10.102.17.76
+
 volumes:
  my-db:
+
+networks:
+    spring-cloud-network:
+        driver: bridge
