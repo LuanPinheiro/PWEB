@@ -8,8 +8,8 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 public record ConsultaEnviar(
-		Long idMedico,
-		@NotNull(message = "É necessário indicar um paciente") Long idPaciente,
+		String crmMedico,
+		@NotNull(message = "É necessário indicar um paciente") String cpfPaciente,
 		@FutureOrPresent(message = "Data mínima para consulta inválida") @NotNull(message = "É necessário indicar uma data") LocalDate data,
 		@NotNull(message = "É necessário indicar um horário") LocalTime hora,
 		@NotNull(message = "É necessário indicar a especialidade") Especialidade especialidade){

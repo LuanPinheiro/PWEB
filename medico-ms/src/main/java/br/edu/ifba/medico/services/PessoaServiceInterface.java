@@ -21,19 +21,19 @@ public interface PessoaServiceInterface<Tabela, DtoEnviar, DtoListar, DtoAtualiz
 	public void novoRegistro(DtoEnviar dados) throws RegistroExistenteException;
 	
 	/**
-	 * Apaga um registro dado um id na tabela caso ele exista e ativo = true
+	 * Apaga um registro dado o campo identificador na tabela caso ele exista e ativo = true
 	 * */
-	public void removeRegistro(Long id) throws RegistroNotFoundException;
+	public void removeRegistro(String identificador) throws RegistroNotFoundException;
 	
 	/**
-	 * Atualiza um registro dado o id na tabela e caso ativo = true
+	 * Atualiza um registro dado o campo identificador na tabela e caso ativo = true
 	 * */
-	public void atualizaRegistro(DtoAtualizar dados, Long id) throws RegistroNotFoundException, InvalidFieldsException;
+	public void atualizaRegistro(DtoAtualizar dados) throws RegistroNotFoundException, InvalidFieldsException;
 	
 	/**
-	 * Encontra um registro dado o id na tabela caso ele exista e ativo = true
+	 * Encontra um registro dado o campo identificador na tabela caso ele exista e ativo = true
 	 * */
-	public Tabela encontrarPorId(Long id) throws RegistroNotFoundException;
+	public Tabela encontrarPorIdentificador(String identificador) throws RegistroNotFoundException;
 	
 	/**
 	 * Valida os campos do DTO de atualização, retornando falha em caso de enviar um campo inválido

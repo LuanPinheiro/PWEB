@@ -49,19 +49,20 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	}
 
 	@Override
-	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Medico medico = this.encontrarPorId(id);
+	public void removeRegistro(String identificador) throws RegistroNotFoundException {
+		System.out.println(identificador);
+		Medico medico = this.encontrarPorIdentificador(identificador);
 		medico.setAtivo(false);
 		medicoRepository.save(medico);
 	}
 
 	@Override
-	public void atualizaRegistro(MedicoAtualizar dados, Long id) 
+	public void atualizaRegistro(MedicoAtualizar dados) 
 			throws RegistroNotFoundException, InvalidFieldsException {
 		
 		this.validaCamposDto(dados);
 		
-		Medico medico = encontrarPorId(id);
+		Medico medico = encontrarPorIdentificador(dados.crm());
 		
 		DadosPessoais dadosPessoais = medico.getDadosPessoais();
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
@@ -78,17 +79,19 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	public void validaCamposDto(MedicoAtualizar dto) throws InvalidFieldsException {
 		if(
 				dto.email() != null 
-				|| dto.crm() != null
 				|| dto.especialidade() != null
 				|| dto.allFieldsNull()
+				|| (dto.crm() != null && (dto.telefone() == null && dto.nome() == null))
 				) {
 			throw new InvalidFieldsException();
 		}
+		
+			
 	}
 	
 	@Override
-	public Medico encontrarPorId(Long id) throws RegistroNotFoundException{
-		return medicoRepository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegistroNotFoundException("Médico"));
+	public Medico encontrarPorIdentificador(String identificador) throws RegistroNotFoundException{
+		return medicoRepository.findByCrmAndAtivoTrue(identificador).orElseThrow(() -> new RegistroNotFoundException("Médico"));
 	}
 
 	/**

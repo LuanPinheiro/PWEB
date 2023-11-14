@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +25,12 @@ import br.edu.ifba.medico.dtos.MedicoListar;
 import br.edu.ifba.medico.models.Especialidade;
 import br.edu.ifba.medico.services.MedicoService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 
 @RestController
 @RequestMapping("/medicos")
+@Validated
 public class MedicoController {
 	
 	@Autowired
@@ -42,31 +44,29 @@ public class MedicoController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public void novoMedico(@Valid @RequestBody MedicoEnviar dadosMedico){
+	public void novoMedico(@RequestBody MedicoEnviar dadosMedico){
 		
 		medicoService.novoRegistro(dadosMedico);
 	}
 	
-	@PutMapping("/{id}")
-	public ResponseEntity<?> atualizaMedico(
-			@NotNull @Valid @RequestBody MedicoAtualizar dadosMedico,
-			@PathVariable Long id){
+	@PutMapping
+	public ResponseEntity<?> atualizaMedico(@Valid @RequestBody MedicoAtualizar dadosMedico){
 		
-		medicoService.atualizaRegistro(dadosMedico, id);
+		medicoService.atualizaRegistro(dadosMedico);
 		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removeMedico(@PathVariable Long id){
+	@DeleteMapping
+	public ResponseEntity<?> removeMedico(@NotBlank(message = "CRM inválido ou nulo") @RequestBody String crm){
 		
-		medicoService.removeRegistro(id);
+		medicoService.removeRegistro(crm);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@GetMapping("/encontrarPorId/{id}")
-	public ResponseEntity<MedicoConsulta> encontrarPorId(@PathVariable Long id){
+	@GetMapping("/encontrarPorCrm")
+	public ResponseEntity<MedicoConsulta> encontrarPorCrm(@NotBlank(message = "CRM inválido ou nulo") @RequestParam("crm") String crm){
 		
-		return new ResponseEntity<>(new MedicoConsulta(medicoService.encontrarPorId(id)), HttpStatus.OK);
+		return new ResponseEntity<>(new MedicoConsulta(medicoService.encontrarPorIdentificador(crm)), HttpStatus.OK);
 	}
 	
 	@GetMapping("/encontrarPorEspecialidade/{especialidade}")

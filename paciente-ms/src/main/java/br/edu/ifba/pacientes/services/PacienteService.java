@@ -45,19 +45,19 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	}
 
 	@Override
-	public void removeRegistro(Long id) throws RegistroNotFoundException {
-		Paciente paciente = this.encontrarPorId(id);
+	public void removeRegistro(String identificador) throws RegistroNotFoundException {
+		Paciente paciente = this.encontrarPorIdentificador(identificador);
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
 	}
 
 	@Override
-	public void atualizaRegistro(PacienteAtualizar dados, Long id)
+	public void atualizaRegistro(PacienteAtualizar dados)
 			throws RegistroNotFoundException, InvalidFieldsException {
 		
 		this.validaCamposDto(dados);
 		
-		Paciente paciente = encontrarPorId(id);
+		Paciente paciente = encontrarPorIdentificador(dados.cpf());
 		
 		DadosPessoais dadosPessoais = paciente.getDadosPessoais();
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
@@ -73,15 +73,15 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	public void validaCamposDto(PacienteAtualizar dto) throws InvalidFieldsException {
 		if(
 				dto.email() != null
-				|| dto.cpf() != null
 				|| dto.allFieldsNull()
+				|| (dto.cpf() != null && (dto.telefone() == null && dto.nome() == null))
 				) {
 			throw new InvalidFieldsException();
 		}
 	}
 
 	@Override
-	public Paciente encontrarPorId(Long id) throws RegistroNotFoundException {
-		return pacienteRepository.findByIdAndAtivoTrue(id).orElseThrow(() -> new RegistroNotFoundException());
+	public Paciente encontrarPorIdentificador(String identificador) throws RegistroNotFoundException {
+		return pacienteRepository.findByCpfAndAtivoTrue(identificador).orElseThrow(() -> new RegistroNotFoundException());
 	}
 }

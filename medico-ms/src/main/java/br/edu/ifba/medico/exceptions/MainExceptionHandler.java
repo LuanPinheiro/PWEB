@@ -1,5 +1,6 @@
 package br.edu.ifba.medico.exceptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class MainExceptionHandler extends ResponseEntityExceptionHandler {
@@ -35,6 +38,16 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex) {
+	    
+		Map<String, String> errors = new HashMap<String, String>();
+		String errorMessage = new ArrayList<>(ex.getConstraintViolations()).get(0).getMessage();
+        
+		errors.put("message", errorMessage);
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
+	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<Object> handleMethodArgumentTypeMismatchException() {
 	    
@@ -50,7 +63,9 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 		if(ex.getMessage().contains("Especialidade")) {
 			return handleMethodArgumentTypeMismatchException();			
 		}
-        errors.put("message", ex.getMessage());
+		else {
+			errors.put("message", ex.getMessage());
+		}
 		return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
 	}
 	

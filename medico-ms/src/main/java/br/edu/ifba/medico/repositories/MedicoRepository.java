@@ -13,7 +13,7 @@ import br.edu.ifba.medico.models.Medico;
 
 @Repository
 public interface MedicoRepository extends JpaRepository<Medico, Long>{
-	public Optional<Medico> findByIdAndAtivoTrue(Long id);
+	public Optional<Medico> findByCrmAndAtivoTrue(String crm);
 	public List<Medico> findByEspecialidadeAndAtivoTrue(Especialidade especialidade);
 	public Page<Medico> findByAtivoTrue(Pageable pageable);
 	public Optional<Medico> findByCrm(String crm);

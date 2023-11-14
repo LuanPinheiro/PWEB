@@ -68,9 +68,9 @@ public class ConsultaService {
 		LocalDate data = dados.data();
 		LocalTime hora = dados.hora();
 		
-		MedicoConsulta medico = validaMedico(dados.idMedico(), dados.especialidade(), data, hora);
+		MedicoConsulta medico = validaMedico(dados.crmMedico(), dados.especialidade(), data, hora);
 				
-		PacienteConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
+		PacienteConsulta paciente = pacienteClient.encontrarPorCpf(dados.cpfPaciente()).getBody();
 
 		validaData(data, hora);
 		Consulta consulta = validaConsulta(medico.id(), paciente.id(), data, hora);
@@ -79,13 +79,16 @@ public class ConsultaService {
 		enviarEmailsMarcar(medico, paciente, consulta);
 	}
 
-	private MedicoConsulta validaMedico(Long idMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
-		if(idMedico == null) {
+	private MedicoConsulta validaMedico(String crmMedico, Especialidade especialidade, LocalDate data, LocalTime hora) throws RegistroNotFoundException {
+		if(crmMedico == null) {
 			List<MedicoConsulta> medicos = medicoClient.encontrarPorEspecialidade(especialidade).getBody();
 			return medicoDisponivelLista(medicos, data, hora);
 		}
 		
-		return medicoClient.encontrarPorId(idMedico).getBody();
+		MedicoConsulta medico = medicoClient.encontrarPorCrm(crmMedico).getBody();
+		System.out.println(medico.email());
+		
+		return medicoClient.encontrarPorCrm(crmMedico).getBody();
 	}
 	
 	private void enviarEmailsMarcar(MedicoConsulta medico, PacienteConsulta paciente, Consulta consulta) {
@@ -134,9 +137,9 @@ public class ConsultaService {
 			throws RegistroNotFoundException,
 			ConsultaNotFoundException,
 			CantCancelConsultaException {
-		MedicoConsulta medico = medicoClient.encontrarPorId(dados.idMedico()).getBody();
+		MedicoConsulta medico = medicoClient.encontrarPorCrm(dados.crmMedico()).getBody();
 		
-		PacienteConsulta paciente = pacienteClient.encontrarPorId(dados.idPaciente()).getBody();
+		PacienteConsulta paciente = pacienteClient.encontrarPorCpf(dados.cpfPaciente()).getBody();
 		
 		Consulta consulta = this.encontrarPorIds(new ConsultaId(
 				medico.id(),
