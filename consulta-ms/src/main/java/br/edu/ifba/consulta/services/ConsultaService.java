@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.consulta.amqp.DesativacaoDTO;
 import br.edu.ifba.consulta.amqp.EmailDto;
 import br.edu.ifba.consulta.clients.Especialidade;
 import br.edu.ifba.consulta.clients.MedicoClient;
@@ -259,5 +260,31 @@ public class ConsultaService {
 			throw new RegistroNotFoundException("Médico dessa especialidade para essa data e hora");
 		}
 		return medicoAvailable;
+	}
+
+	public void cancelarRegistro(DesativacaoDTO desativacao) {
+		switch(desativacao.motivo()) {
+			case medico_desativado:
+				consultaRepository
+				.findByIdsMedicoIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(desativacao.id(), LocalDate.now())
+				.forEach((consulta) -> {
+					consulta.setDesmarcado(true);
+					consulta.setMotivo(desativacao.motivo());
+					consultaRepository.save(consulta);
+				});
+			break;
+			
+			case paciente_desativado:
+				List<Consulta> consultas = consultaRepository.findByIdsPacienteIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(desativacao.id(), LocalDate.now());
+				System.out.println(consultas.size());
+				System.out.println(consultas.get(0).isDesmarcado());
+				for(Consulta consulta : consultas) {
+					consulta.setDesmarcado(true);
+					consulta.setMotivo(desativacao.motivo());
+					consultaRepository.save(consulta);
+				}
+			break;
+			default: break;
+		}
 	}
 }

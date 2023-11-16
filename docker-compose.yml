@@ -55,7 +55,8 @@ services:
             - spring-cloud-network
         environment:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
-          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/enderecos?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/enderecos?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_PASSWORD=password
 
     medico-ms:
         container_name: eureka-medicos
@@ -67,7 +68,8 @@ services:
             - spring-cloud-network
         environment:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
-          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/medicos?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/medicos?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_PASSWORD=password
 
     paciente-ms:
         container_name: eureka-pacientes
@@ -79,7 +81,8 @@ services:
             - spring-cloud-network
         environment:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
-          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/pacientes?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/pacientes?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_PASSWORD=password
 
     consulta-ms:
         container_name: eureka-consultas
@@ -90,8 +93,9 @@ services:
             - spring-cloud-network
         environment:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
-          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/consultas?createDatabaseIfNotExist=true
-          - SPRING_RABBITMQ_HOST=10.102.17.76
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/consultas?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_PASSWORD=password
+          - SPRING_RABBITMQ_HOST=10.102.17.86
 
     email-ms:
         container_name: emails
@@ -101,10 +105,11 @@ services:
         networks:
             - spring-cloud-network
         environment:
-          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.76:3309/emails?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/emails?createDatabaseIfNotExist=true
+          - SPRING_DATASOURCE_PASSWORD=password
           - SPRING_MAIL_USERNAME=qastudent.trilhas@gmail.com
           - SPRING_MAIL_PASSWORD=fdndhmlobajbmktw
-          - SPRING_RABBITMQ_HOST=10.102.17.76
+          - SPRING_RABBITMQ_HOST=10.102.17.86
 
 volumes:
  my-db:

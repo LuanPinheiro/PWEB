@@ -36,13 +36,10 @@ public class Email {
 	
 	public Email(EmailDto dto) {
 		super();
-		this.id = id;
-		this.mailFrom = mailFrom;
-		this.mailTo = mailTo;
-		this.mailSubject = mailSubject;
-		this.mailText = mailText;
-		this.sendDateEmail = sendDateEmail;
-		this.status = status;
+		this.mailFrom = dto.mailFrom();
+		this.mailTo = dto.mailTo();
+		this.mailSubject = dto.mailSubject();
+		this.mailText = dto.mailText();
 	}
 
 

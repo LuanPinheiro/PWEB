@@ -1,11 +1,14 @@
 package br.edu.ifba.pacientes.services;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.pacientes.amqp.DesativacaoDTO;
+import br.edu.ifba.pacientes.amqp.Motivo;
 import br.edu.ifba.pacientes.clients.EnderecoClient;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
@@ -25,6 +28,9 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	
 	@Autowired
 	private EnderecoClient enderecoClient;
+	
+	@Autowired
+    private RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public Page<PacienteListar> listarTodos(Integer page) {
@@ -49,6 +55,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		Paciente paciente = this.encontrarPorIdentificador(identificador);
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
+		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(paciente.getId(), Motivo.paciente_desativado));
 	}
 
 	@Override

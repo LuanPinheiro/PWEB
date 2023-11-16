@@ -3,12 +3,15 @@ package br.edu.ifba.medico.services;
 
 import java.util.List;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import br.edu.ifba.medico.amqp.DesativacaoDTO;
+import br.edu.ifba.medico.amqp.Motivo;
 import br.edu.ifba.medico.clients.EnderecoClient;
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
@@ -29,6 +32,9 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	
 	@Autowired
 	private EnderecoClient enderecoClient;
+	
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 	
 	@Override
 	public Page<MedicoListar> listarTodos(Integer page) {
@@ -54,6 +60,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		Medico medico = this.encontrarPorIdentificador(identificador);
 		medico.setAtivo(false);
 		medicoRepository.save(medico);
+		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(medico.getId(), Motivo.medico_desativado));
 	}
 
 	@Override

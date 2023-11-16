@@ -57,7 +57,7 @@ public class MedicoController {
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<?> removeMedico(@NotBlank(message = "CRM inválido ou nulo") @RequestBody String crm){
+	public ResponseEntity<?> removeMedico(@NotBlank(message = "CRM inválido ou nulo") @RequestParam("crm") String crm){
 		
 		medicoService.removeRegistro(crm);
 		return new ResponseEntity<>(HttpStatus.OK);

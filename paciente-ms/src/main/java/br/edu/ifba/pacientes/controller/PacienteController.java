@@ -50,7 +50,7 @@ public class PacienteController {
 	}
 	
 	@DeleteMapping
-	public ResponseEntity<?> removePaciente(@CPF @RequestBody String cpf){
+	public ResponseEntity<?> removePaciente(@CPF @RequestParam("cpf") String cpf){
 		
 		pacienteService.removeRegistro(cpf);
 		return new ResponseEntity<>(HttpStatus.OK);

@@ -2,6 +2,7 @@ package br.edu.ifba.consulta.repositories;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface ConsultaRepository extends JpaRepository<Consulta, ConsultaId> 
 	public Optional<Consulta> findByIdsAndDesmarcadoFalse(ConsultaId ids);
 	public Optional<Consulta> findByIdsDataAndIdsPacienteIdAndDesmarcadoFalse(LocalDate data, Long pacienteId);
 	public Optional<Consulta> findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(Long medicoId, LocalDate data, LocalTime hora);
+	public List<Consulta> findByIdsMedicoIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(Long medicoId, LocalDate data);
+	public List<Consulta> findByIdsPacienteIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(Long pacienteId, LocalDate data);
 }
