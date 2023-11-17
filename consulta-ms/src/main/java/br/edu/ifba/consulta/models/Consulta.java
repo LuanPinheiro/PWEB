@@ -3,8 +3,7 @@ package br.edu.ifba.consulta.models;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import org.hibernate.annotations.ColumnDefault;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +15,7 @@ public class Consulta {
 	@EmbeddedId
 	private ConsultaId ids;
 	
-	@ColumnDefault(value = "FALSE")
+	@Column(nullable = true)
 	private boolean desmarcado;
 	
 	@Enumerated(EnumType.STRING)

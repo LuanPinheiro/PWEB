@@ -263,26 +263,13 @@ public class ConsultaService {
 	}
 
 	public void cancelarRegistro(DesativacaoDTO desativacao) {
+		
 		switch(desativacao.motivo()) {
 			case medico_desativado:
-				consultaRepository
-				.findByIdsMedicoIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(desativacao.id(), LocalDate.now())
-				.forEach((consulta) -> {
-					consulta.setDesmarcado(true);
-					consulta.setMotivo(desativacao.motivo());
-					consultaRepository.save(consulta);
-				});
+				consultaRepository.cancelarMedicoDesativado(desativacao.id(), desativacao.motivo());
 			break;
-			
 			case paciente_desativado:
-				List<Consulta> consultas = consultaRepository.findByIdsPacienteIdAndIdsDataGreaterThanEqualAndDesmarcadoFalse(desativacao.id(), LocalDate.now());
-				System.out.println(consultas.size());
-				System.out.println(consultas.get(0).isDesmarcado());
-				for(Consulta consulta : consultas) {
-					consulta.setDesmarcado(true);
-					consulta.setMotivo(desativacao.motivo());
-					consultaRepository.save(consulta);
-				}
+				consultaRepository.cancelarPacienteDesativado(desativacao.id(), desativacao.motivo());
 			break;
 			default: break;
 		}
