@@ -221,7 +221,7 @@ public class ConsultaService {
 	 * Encontra uma consulta com os dados da chave primária composta
 	 * */
 	private Optional<Consulta> encontrarPorIds(ConsultaId ids) {
-		return consultaRepository.findByIdsAndDesmarcadoFalse(ids);
+		return consultaRepository.findByIds(ids);
 	}
 
 	/**

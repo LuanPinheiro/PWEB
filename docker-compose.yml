@@ -70,6 +70,7 @@ services:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
           - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/medicos?createDatabaseIfNotExist=true
           - SPRING_DATASOURCE_PASSWORD=password
+          - SPRING_RABBITMQ_HOST=10.102.17.86
 
     paciente-ms:
         container_name: eureka-pacientes
@@ -83,6 +84,7 @@ services:
           - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8083/eureka
           - SPRING_DATASOURCE_URL=jdbc:mysql://10.102.17.86:3309/pacientes?createDatabaseIfNotExist=true
           - SPRING_DATASOURCE_PASSWORD=password
+          - SPRING_RABBITMQ_HOST=10.102.17.86
 
     consulta-ms:
         container_name: eureka-consultas

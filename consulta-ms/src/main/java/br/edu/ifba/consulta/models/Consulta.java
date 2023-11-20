@@ -3,19 +3,17 @@ package br.edu.ifba.consulta.models;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 @Entity(name = "consultas")
-public class Consulta {
+public class Consulta{
 	
 	@EmbeddedId
 	private ConsultaId ids;
 	
-	@Column(nullable = true)
 	private boolean desmarcado;
 	
 	@Enumerated(EnumType.STRING)

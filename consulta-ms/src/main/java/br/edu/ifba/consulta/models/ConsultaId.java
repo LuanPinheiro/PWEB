@@ -34,9 +34,7 @@ public class ConsultaId implements Serializable {
 		this.data = data;
 		this.hora = hora;
 	}
-
 	
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(data, hora, medicoId, pacienteId);

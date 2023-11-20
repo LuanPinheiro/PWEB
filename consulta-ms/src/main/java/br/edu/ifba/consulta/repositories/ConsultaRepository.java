@@ -16,7 +16,7 @@ import jakarta.transaction.Transactional;
 
 public interface ConsultaRepository extends JpaRepository<Consulta, ConsultaId> {
 
-	public Optional<Consulta> findByIdsAndDesmarcadoFalse(ConsultaId ids);
+	public Optional<Consulta> findByIds(ConsultaId ids);
 	public Optional<Consulta> findByIdsDataAndIdsPacienteIdAndDesmarcadoFalse(LocalDate data, Long pacienteId);
 	public Optional<Consulta> findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(Long medicoId, LocalDate data, LocalTime hora);
 	
