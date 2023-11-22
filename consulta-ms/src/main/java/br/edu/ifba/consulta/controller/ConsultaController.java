@@ -15,13 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.ifba.consulta.dtos.ConsultaCancelar;
 import br.edu.ifba.consulta.dtos.ConsultaEnviar;
 import br.edu.ifba.consulta.dtos.ConsultaListar;
-import br.edu.ifba.consulta.exceptions.CantCancelConsultaException;
-import br.edu.ifba.consulta.exceptions.ConsultaExistenteException;
-import br.edu.ifba.consulta.exceptions.ConsultaNotFoundException;
-import br.edu.ifba.consulta.exceptions.DataInvalidaException;
-import br.edu.ifba.consulta.exceptions.MedicoUnavailableException;
-import br.edu.ifba.consulta.exceptions.PacienteJaAgendadoException;
-import br.edu.ifba.consulta.exceptions.RegistroNotFoundException;
 import br.edu.ifba.consulta.services.ConsultaService;
 import jakarta.validation.Valid;
 
