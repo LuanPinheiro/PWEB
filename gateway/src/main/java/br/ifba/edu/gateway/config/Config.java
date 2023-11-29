@@ -15,11 +15,7 @@ public class Config extends CorsConfiguration{
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 	    corsConfiguration.addAllowedOrigin("*");
 	    corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-//	    corsConfiguration.addAllowedHeader("origin");
-//	    corsConfiguration.addAllowedHeader("content-type");
-//	    corsConfiguration.addAllowedHeader("accept");
-//	    corsConfiguration.addAllowedHeader("authorization");
-//	    corsConfiguration.addAllowedHeader("cookie");
+	    corsConfiguration.addAllowedHeader("*");
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", corsConfiguration);
 	    return new CorsWebFilter(source);

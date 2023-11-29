@@ -13,10 +13,10 @@ import jakarta.persistence.Embeddable;
 public class ConsultaId implements Serializable {
 	
 	@Column(name = "medico_id", nullable = false)
-	private Long medicoId;
+	private String medicoId;
 	
 	@Column(name = "paciente_id", nullable = false)
-	private Long pacienteId;
+	private String pacienteId;
 	
 	@Column(name = "data", nullable = false)
 	private LocalDate data;
@@ -28,7 +28,7 @@ public class ConsultaId implements Serializable {
 		
 	}
 	
-	public ConsultaId(Long medicoId, Long pacienteId, LocalDate data, LocalTime hora) {
+	public ConsultaId(String medicoId, String pacienteId, LocalDate data, LocalTime hora) {
 		this.medicoId = medicoId;
 		this.pacienteId = pacienteId;
 		this.data = data;
@@ -53,19 +53,19 @@ public class ConsultaId implements Serializable {
 				&& Objects.equals(medicoId, other.medicoId) && Objects.equals(pacienteId, other.pacienteId);
 	}
 
-	public Long getMedicoId() {
+	public String getMedicoId() {
 		return medicoId;
 	}
 
-	public void setMedicoId(Long medicoId) {
+	public void setMedicoId(String medicoId) {
 		this.medicoId = medicoId;
 	}
 
-	public Long getPacienteId() {
+	public String getPacienteId() {
 		return pacienteId;
 	}
 
-	public void setPacienteId(Long pacienteId) {
+	public void setPacienteId(String pacienteId) {
 		this.pacienteId = pacienteId;
 	}
 

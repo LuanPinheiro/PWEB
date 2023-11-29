@@ -51,7 +51,7 @@ public class ConsultaService {
 	
 	public List<ConsultaListar> converteLista(List<Consulta> lista){
 		// Convertendo cada registro de uma query para um DTO de listagem
-		return lista.stream().map(ConsultaListar::new).collect(Collectors.toList());
+		return lista.stream().map((consulta) -> new ConsultaListar(consulta)).collect(Collectors.toList());
 	}
 	
 	public List<ConsultaListar> listarConsultas() {
@@ -74,7 +74,7 @@ public class ConsultaService {
 		PacienteConsulta paciente = pacienteClient.encontrarPorCpf(dados.cpfPaciente()).getBody();
 
 		validaData(data, hora);
-		Consulta consulta = validaConsulta(medico.id(), paciente.id(), data, hora);
+		Consulta consulta = validaConsulta(medico.crm(), paciente.cpf(), data, hora);
 		
 		consultaRepository.save(consulta);
 		enviarEmailsMarcar(medico, paciente, consulta);
@@ -143,8 +143,8 @@ public class ConsultaService {
 		PacienteConsulta paciente = pacienteClient.encontrarPorCpf(dados.cpfPaciente()).getBody();
 		
 		Consulta consulta = this.encontrarPorIds(new ConsultaId(
-				medico.id(),
-				paciente.id(),
+				medico.crm(),
+				paciente.cpf(),
 				dados.data(),
 				dados.hora())).orElseThrow(() -> new ConsultaNotFoundException("Essa consulta não foi agendada"));
 		
@@ -189,7 +189,7 @@ public class ConsultaService {
 			throw new DataInvalidaException("Consulta só pode ser marcada com no mínimo 30 minutos de antecedência");
 	}
 	
-	private Consulta validaConsulta(Long medico, Long paciente, LocalDate data, LocalTime hora) 
+	private Consulta validaConsulta(String medico, String paciente, LocalDate data, LocalTime hora) 
 			throws ConsultaExistenteException,
 			PacienteJaAgendadoException,
 			MedicoUnavailableException {
@@ -227,7 +227,7 @@ public class ConsultaService {
 	/**
 	 * Valida se o paciente já tem consulta no dia
 	 * */
-	private void pacienteTemConsulta(Long id, LocalDate data) throws PacienteJaAgendadoException {
+	private void pacienteTemConsulta(String id, LocalDate data) throws PacienteJaAgendadoException {
 		if(consultaRepository.findByIdsDataAndIdsPacienteIdAndDesmarcadoFalse(data, id).isPresent()) {
 			throw new PacienteJaAgendadoException();
 		}
@@ -236,7 +236,7 @@ public class ConsultaService {
 	/**
 	 * Valida se o médico já tem consulta nessa hora
 	 * */
-	private void medicoDisponivel(Long id, LocalDate data, LocalTime hora) throws MedicoUnavailableException {
+	private void medicoDisponivel(String id, LocalDate data, LocalTime hora) throws MedicoUnavailableException {
 		if(consultaRepository.findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(id, data, hora).isPresent()) {
 			throw new MedicoUnavailableException();
 		}
@@ -250,7 +250,7 @@ public class ConsultaService {
 		MedicoConsulta medicoAvailable = null;
 		for (MedicoConsulta medico : medicos) {
 			try {
-				medicoDisponivel(medico.id(), data,hora);
+				medicoDisponivel(medico.crm(), data,hora);
 				medicoAvailable = medico;
 				break;
 			} catch (MedicoUnavailableException e) {

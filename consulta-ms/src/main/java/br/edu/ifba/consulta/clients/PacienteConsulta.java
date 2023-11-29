@@ -1,4 +1,4 @@
 package br.edu.ifba.consulta.clients;
 
-public record PacienteConsulta(Long id, String email, String nome) {
+public record PacienteConsulta(String cpf, String email, String nome) {
 }

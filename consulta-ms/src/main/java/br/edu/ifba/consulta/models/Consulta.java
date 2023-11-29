@@ -22,7 +22,7 @@ public class Consulta{
 	public Consulta() {
 	}
 	
-	public Consulta(Long medico, Long paciente, LocalDate data, LocalTime hora) {
+	public Consulta(String medico, String paciente, LocalDate data, LocalTime hora) {
 		this.ids = new ConsultaId(medico, paciente, data, hora);
 		this.desmarcado = false;
 		this.motivo = null;
@@ -36,19 +36,19 @@ public class Consulta{
 		this.ids = id;
 	}
 
-	public Long getMedico() {
+	public String getMedico() {
 		return this.ids.getMedicoId();
 	}
 
-	public void setMedico(Long medico) {
+	public void setMedico(String medico) {
 		this.ids.setMedicoId(medico);
 	}
 
-	public Long getPaciente() {
+	public String getPaciente() {
 		return this.ids.getPacienteId();
 	}
 
-	public void setPaciente(Long paciente) {
+	public void setPaciente(String paciente) {
 		this.ids.setPacienteId(paciente);
 	}
 
