@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient("endereco-ms")
 public interface EnderecoClient {
 	@RequestMapping(method = RequestMethod.POST, value = "/enderecos")
-	public ResponseEntity<Long> gerarEndereco(@RequestBody EnderecoDTO dto);
+	public ResponseEntity<EnderecoDTO> gerarEndereco(@RequestBody EnderecoDTO dto);
 }
