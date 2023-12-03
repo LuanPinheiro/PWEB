@@ -55,7 +55,7 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 		Paciente paciente = this.encontrarPorIdentificador(identificador);
 		paciente.setAtivo(false);
 		pacienteRepository.save(paciente);
-		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(paciente.getId(), Motivo.paciente_desativado));
+		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(paciente.getCpf(), Motivo.paciente_desativado));
 	}
 
 	@Override

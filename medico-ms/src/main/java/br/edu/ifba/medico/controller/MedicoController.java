@@ -42,6 +42,12 @@ public class MedicoController {
 		return medicoService.listarTodos(page);
 	}
 	
+	@GetMapping("/email")
+	@ResponseStatus(HttpStatus.OK)
+	public Page<MedicoListar> listarMedicosPorEmail(@RequestParam(name="page", required=false) Integer page, @RequestParam(name="email", required = true) String email) {
+		return medicoService.listarPorEmail(page, email);
+	}
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public void novoMedico(@RequestBody MedicoEnviar dadosMedico){
@@ -50,10 +56,10 @@ public class MedicoController {
 	}
 	
 	@PutMapping
-	public ResponseEntity<?> atualizaMedico(@Valid @RequestBody MedicoAtualizar dadosMedico){
+	@ResponseStatus(HttpStatus.ACCEPTED)
+	public void atualizaMedico(@Valid @RequestBody MedicoAtualizar dadosMedico){
 		
 		medicoService.atualizaRegistro(dadosMedico);
-		return new ResponseEntity<>(HttpStatus.ACCEPTED);
 	}
 	
 	@DeleteMapping

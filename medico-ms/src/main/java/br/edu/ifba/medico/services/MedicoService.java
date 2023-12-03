@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import br.edu.ifba.medico.amqp.DesativacaoDTO;
 import br.edu.ifba.medico.amqp.Motivo;
 import br.edu.ifba.medico.clients.EnderecoClient;
+import br.edu.ifba.medico.clients.EnderecoDTO;
 import br.edu.ifba.medico.dtos.MedicoAtualizar;
 import br.edu.ifba.medico.dtos.MedicoEnviar;
 import br.edu.ifba.medico.dtos.MedicoListar;
@@ -40,12 +41,24 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	public Page<MedicoListar> listarTodos(Integer page) {
 		return medicoRepository
 				.findByAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")))
-				.map(MedicoListar::new);
+				.map((medico) -> {
+					EnderecoDTO endereco = enderecoClient.encontrarEnderecoPorId(medico.getDadosPessoais().getEndereco()).getBody();
+					return new MedicoListar(medico, endereco);
+				});
+	}
+	
+	public Page<MedicoListar> listarPorEmail(Integer page, String email) {
+		return medicoRepository
+				.findByDadosPessoaisEmailAndAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")), email)
+				.map((medico) -> {
+					EnderecoDTO endereco = enderecoClient.encontrarEnderecoPorId(medico.getDadosPessoais().getEndereco()).getBody();
+					return new MedicoListar(medico, endereco);
+				});
 	}
 	
 	@Override
 	public void novoRegistro(MedicoEnviar dados) throws RegistroExistenteException {
-		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody();
+		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody().id();
 		Medico medico = medicoRepository.findByCrm(dados.crm()).orElse(new Medico(dados, endereco));
 		if(medico.isAtivo()) {
 			throw new RegistroExistenteException();
@@ -60,7 +73,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		Medico medico = this.encontrarPorIdentificador(identificador);
 		medico.setAtivo(false);
 		medicoRepository.save(medico);
-		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(medico.getId(), Motivo.medico_desativado));
+		rabbitTemplate.convertAndSend("desativacao_registro_ex","", new DesativacaoDTO(medico.getCrm(), Motivo.medico_desativado));
 	}
 
 	@Override
@@ -75,7 +88,7 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 		dadosPessoais.setNome(dados.nome() == null ? dadosPessoais.getNome() : dados.nome());
 		
 		if(dados.endereco() != null)
-			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody());
+			dadosPessoais.setEndereco(enderecoClient.gerarEndereco(dados.endereco()).getBody().id());
 		
 		dadosPessoais.setTelefone(dados.telefone() == null ? dadosPessoais.getTelefone() : dados.telefone());
 		

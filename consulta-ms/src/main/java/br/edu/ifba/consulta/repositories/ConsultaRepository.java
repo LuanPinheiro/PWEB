@@ -27,11 +27,10 @@ public interface ConsultaRepository extends JpaRepository<Consulta, ConsultaId> 
 	@Modifying
 	@Transactional
 	@Query("update consultas c set c.desmarcado = TRUE, c.motivo = :motivo where c.ids.pacienteId = :id and c.desmarcado = false")
-	public void cancelarPacienteDesativado(@Param("id")Long id, @Param("motivo")Motivo motivo);
+	public void cancelarPacienteDesativado(@Param("id")String id, @Param("motivo")Motivo motivo);
 	
 	@Modifying
 	@Transactional
 	@Query("update consultas c set c.desmarcado = TRUE, c.motivo = :motivo where c.ids.medicoId = :id and c.desmarcado = false")
-	public void cancelarMedicoDesativado(@Param("id")Long id, @Param("motivo")Motivo motivo);
-	
+	public void cancelarMedicoDesativado(@Param("id")String id, @Param("motivo")Motivo motivo);
 }

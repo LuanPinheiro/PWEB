@@ -1,6 +1,6 @@
 package br.edu.ifba.pacientes.amqp;
 
 public record DesativacaoDTO(
-		Long id,
+		String id,
 		Motivo motivo) {
 }

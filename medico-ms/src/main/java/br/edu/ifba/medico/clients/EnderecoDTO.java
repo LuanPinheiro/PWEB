@@ -3,6 +3,7 @@ package br.edu.ifba.medico.clients;
 import jakarta.validation.constraints.NotBlank;
 
 public record EnderecoDTO(
+		Long id,
 		@NotBlank(message = "Logradouro não pode ser nulo") String logradouro,
 		String numero,
 		String complemento,

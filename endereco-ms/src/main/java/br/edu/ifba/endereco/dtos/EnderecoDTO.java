@@ -4,6 +4,7 @@ import br.edu.ifba.endereco.models.Endereco;
 import jakarta.validation.constraints.NotBlank;
 
 public record EnderecoDTO(
+		Long id,
 		@NotBlank(message = "Logradouro não pode ser nulo") String logradouro,
 		String numero,
 		String complemento,
@@ -13,6 +14,6 @@ public record EnderecoDTO(
 		@NotBlank(message = "CEP não pode ser nulo") String cep) {
 	
 	public EnderecoDTO(Endereco endereco) {
-		this(endereco.getLogradouro(), endereco.getNumero(), endereco.getComplemento(), endereco.getBairro(), endereco.getCidade(), endereco.getUf(), endereco.getCep());
+		this(endereco.getId(), endereco.getLogradouro(), endereco.getNumero(), endereco.getComplemento(), endereco.getBairro(), endereco.getCidade(), endereco.getUf(), endereco.getCep());
 	}
 }
