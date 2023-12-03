@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.edu.ifba.consulta.amqp.DesativacaoDTO;
@@ -49,14 +52,12 @@ public class ConsultaService {
 	@Autowired
     private RabbitTemplate rabbitTemplate;
 	
-	public List<ConsultaListar> converteLista(List<Consulta> lista){
-		// Convertendo cada registro de uma query para um DTO de listagem
-		return lista.stream().map((consulta) -> new ConsultaListar(consulta)).collect(Collectors.toList());
-	}
-	
-	public List<ConsultaListar> listarConsultas() {
-		// Retorna os registros do banco em forma de DTO
-		return this.converteLista(consultaRepository.findAll());
+	public Page<ConsultaListar> listarConsultas(String tabela, String parametro, Integer page) {
+		Pageable pageable = PageRequest.of(page != null ? page : 0, 10);
+		
+		return tabela.equalsIgnoreCase("paciente") ? 
+				consultaRepository.findByIdsPacienteIdAndDesmarcadoFalse(parametro, pageable).map((consulta) -> new ConsultaListar(consulta))
+				: consultaRepository.findByIdsMedicoIdAndDesmarcadoFalse(parametro, pageable).map((consulta) -> new ConsultaListar(consulta));
 	}
 	
 	public void marcarConsulta(ConsultaEnviar dados) 

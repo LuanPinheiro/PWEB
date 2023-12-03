@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +20,9 @@ public interface ConsultaRepository extends JpaRepository<Consulta, ConsultaId> 
 
 	public Optional<Consulta> findByIds(ConsultaId ids);
 	public Optional<Consulta> findByIdsDataAndIdsPacienteIdAndDesmarcadoFalse(LocalDate data, String pacienteId);
-	public Optional<Consulta> findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(String medicoId, LocalDate data, LocalTime hora);
+	public Optional<Consulta> findByIdsMedicoIdAndIdsDataAndIdsHoraAndDesmarcadoFalse(String crm, LocalDate data, LocalTime hora);
+	public Page<Consulta> findByIdsMedicoIdAndDesmarcadoFalse(String crm, Pageable pageable);
+	public Page<Consulta> findByIdsPacienteIdAndDesmarcadoFalse(String cpf, Pageable pageable);
 	
 	@Modifying
 	@Transactional

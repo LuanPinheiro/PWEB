@@ -1,7 +1,5 @@
 package br.edu.ifba.consulta.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.ifba.consulta.dtos.ConsultaCancelar;
 import br.edu.ifba.consulta.dtos.ConsultaEnviar;
-import br.edu.ifba.consulta.dtos.ConsultaListar;
 import br.edu.ifba.consulta.services.ConsultaService;
 import jakarta.validation.Valid;
 
@@ -26,8 +24,24 @@ public class ConsultaController {
 	private ConsultaService consultaService;
 	
 	@GetMapping
-	public List<ConsultaListar> listarConsultas(){
-		return consultaService.listarConsultas();
+	public ResponseEntity<?> listarConsultas(@RequestParam(required = false) String crm, @RequestParam(required = false) String cpf, @RequestParam(required = false) Integer page){
+		String tabela = null;
+		String parametro = null;
+		
+		if((crm == null && cpf == null) || (crm != null && cpf != null)) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		if(crm != null) {
+			tabela = "medico";
+			parametro = crm;
+		}
+		else {
+			tabela = "paciente";
+			parametro = cpf;
+		}
+		
+		return new ResponseEntity<>(consultaService.listarConsultas(tabela, parametro, page), HttpStatus.OK);
 	}
 	
 	@PostMapping
