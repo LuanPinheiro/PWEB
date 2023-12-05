@@ -27,7 +27,7 @@ public class Paciente {
 	private Boolean ativo;
 	
 	public Paciente() {
-		
+		this.ativo = false;
 	}
 	
 	public Paciente(PacienteEnviar dados, Long endereco) {
@@ -58,4 +58,11 @@ public class Paciente {
 	public void setAtivo(Boolean ativo) {
 		this.ativo = ativo;
 	}
+
+	@Override
+	public String toString() {
+		return "Paciente [id=" + id + ", dadosPessoais=" + dadosPessoais + ", cpf=" + cpf + ", ativo=" + ativo + "]";
+	}
+	
+	
 }

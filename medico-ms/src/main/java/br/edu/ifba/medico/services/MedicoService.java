@@ -64,6 +64,8 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 			throw new RegistroExistenteException();
 		}
 		medico.setDadosPessoais(new DadosPessoais(dados.dadosPessoais(), endereco));
+		medico.setCrm(dados.crm());
+		medico.setEspecialidade(dados.especialidade());
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
 	}

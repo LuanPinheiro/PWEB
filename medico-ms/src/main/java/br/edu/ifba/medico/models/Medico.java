@@ -33,7 +33,7 @@ public class Medico {
 	private Boolean ativo;
 	
 	public Medico() {
-		
+		this.ativo = false;
 	}
 	
 	public Medico(MedicoEnviar dados, Long endereco) {

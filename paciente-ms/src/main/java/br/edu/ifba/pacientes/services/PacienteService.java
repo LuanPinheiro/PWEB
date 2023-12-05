@@ -54,14 +54,14 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 
 	@Override
 	public void novoRegistro(PacienteEnviar dados) throws RegistroExistenteException {
-		System.out.println(dados.toString());
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody().id();
 		Paciente paciente = pacienteRepository.findByCpf(dados.cpf()).orElse(new Paciente());
 		if(paciente.isAtivo()) {
 			throw new RegistroExistenteException();
 		}
 		paciente.setDadosPessoais(new DadosPessoais(dados.dadosPessoais(), endereco));
-		paciente.setAtivo(true);
+		paciente.setCpf(dados.cpf());
+		paciente.setAtivo(true);		
 		pacienteRepository.save(paciente);
 	}
 
