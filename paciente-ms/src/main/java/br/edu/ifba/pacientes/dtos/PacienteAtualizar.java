@@ -13,10 +13,6 @@ public record PacienteAtualizar(
 		@Valid EnderecoDTO endereco,
 		@NotBlank(message = "Por favor indique o CPF do paciente que será atualizado") @CPF String cpf) {
 	
-	private PacienteAtualizar() {
-		this(null, null, null, null, null);
-	}
-	
 	public boolean allFieldsNull() {
 		if(this.equals(new PacienteAtualizar(null, null, null, null, null))){
 			return true;

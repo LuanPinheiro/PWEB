@@ -59,10 +59,11 @@ public class MedicoService implements PessoaServiceInterface<Medico, MedicoEnvia
 	@Override
 	public void novoRegistro(MedicoEnviar dados) throws RegistroExistenteException {
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody().id();
-		Medico medico = medicoRepository.findByCrm(dados.crm()).orElse(new Medico(dados, endereco));
+		Medico medico = medicoRepository.findByCrm(dados.crm()).orElse(new Medico());
 		if(medico.isAtivo()) {
 			throw new RegistroExistenteException();
 		}
+		medico.setDadosPessoais(new DadosPessoais(dados.dadosPessoais(), endereco));
 		medico.setAtivo(true);
 		medicoRepository.save(medico);
 	}

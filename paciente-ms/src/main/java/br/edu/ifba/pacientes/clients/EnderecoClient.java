@@ -2,6 +2,7 @@ package br.edu.ifba.pacientes.clients;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -10,4 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface EnderecoClient {
 	@RequestMapping(method = RequestMethod.POST, value = "/enderecos")
 	public ResponseEntity<EnderecoDTO> gerarEndereco(@RequestBody EnderecoDTO dto);
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/enderecos/{endereco}")
+	public ResponseEntity<EnderecoDTO> encontrarEnderecoPorId(@PathVariable Long endereco);
 }

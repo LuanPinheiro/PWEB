@@ -36,6 +36,12 @@ public class PacienteController {
 		return pacienteService.listarTodos(page);
 	}
 	
+	@GetMapping("/email")
+	@ResponseStatus(HttpStatus.OK)
+	public Page<PacienteListar> listarPacientesPorEmail(@RequestParam(name="page", required=false) Integer page, @RequestParam(name="email", required = true) String email) {
+		return pacienteService.listarPorEmail(page, email);
+	}
+	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public void novoPaciente(@Valid @RequestBody PacienteEnviar dadosPaciente){

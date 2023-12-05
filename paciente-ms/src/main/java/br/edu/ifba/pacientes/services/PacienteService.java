@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.edu.ifba.pacientes.amqp.DesativacaoDTO;
 import br.edu.ifba.pacientes.amqp.Motivo;
 import br.edu.ifba.pacientes.clients.EnderecoClient;
+import br.edu.ifba.pacientes.clients.EnderecoDTO;
 import br.edu.ifba.pacientes.dtos.PacienteAtualizar;
 import br.edu.ifba.pacientes.dtos.PacienteEnviar;
 import br.edu.ifba.pacientes.dtos.PacienteListar;
@@ -36,16 +37,30 @@ public class PacienteService implements PessoaServiceInterface<Paciente, Pacient
 	public Page<PacienteListar> listarTodos(Integer page) {
 		return pacienteRepository
 				.findByAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")))
-				.map(PacienteListar::new);
+				.map((paciente) -> {
+					EnderecoDTO endereco = enderecoClient.encontrarEnderecoPorId(paciente.getDadosPessoais().getEndereco()).getBody();
+					return new PacienteListar(paciente, endereco);
+				});
+	}
+	
+	public Page<PacienteListar> listarPorEmail(Integer page, String email) {
+		return pacienteRepository
+				.findByDadosPessoaisEmailAndAtivoTrue(PageRequest.of(page != null ? page : 0, 10, Sort.by(Sort.Direction.ASC, "dadosPessoais.nome")), email)
+				.map((paciente) -> {
+					EnderecoDTO endereco = enderecoClient.encontrarEnderecoPorId(paciente.getDadosPessoais().getEndereco()).getBody();
+					return new PacienteListar(paciente, endereco);
+				});
 	}
 
 	@Override
 	public void novoRegistro(PacienteEnviar dados) throws RegistroExistenteException {
+		System.out.println(dados.toString());
 		Long endereco = enderecoClient.gerarEndereco(dados.dadosPessoais().endereco()).getBody().id();
-		Paciente paciente = pacienteRepository.findByCpf(dados.cpf()).orElse(new Paciente(dados, endereco));
+		Paciente paciente = pacienteRepository.findByCpf(dados.cpf()).orElse(new Paciente());
 		if(paciente.isAtivo()) {
 			throw new RegistroExistenteException();
 		}
+		paciente.setDadosPessoais(new DadosPessoais(dados.dadosPessoais(), endereco));
 		paciente.setAtivo(true);
 		pacienteRepository.save(paciente);
 	}
